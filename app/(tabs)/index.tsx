@@ -13,6 +13,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 // Supposons que TabTwoScreen soit défini ailleurs
 import TabTwoScreen from './explore';
+import MonumentScreen from './Monument';
+import CircuitScreen from './Circuit';
+import addScreen from './gestionmonument/add';
+import ShowMonument from './gestionmonument/show';
+import addScreenC from './gestioncircuit/addC';
+import ShowCircuit from './gestioncircuit/showC';
+ 
+
+
 
 // Création du Stack Navigator
 const Stack = createStackNavigator();
@@ -22,26 +31,22 @@ function LoginScreen({ navigation }: any) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isMounted, setIsMounted] = useState(true);
-
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
+  const [loading, setLoading] = useState(false); // Ajouter un état pour charger le processus de connexion
 
   const validateForm = async () => {
     if (!username || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
     } else {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        if (isMounted) {
-          navigation.navigate('Explore');
-        }
+        setLoading(true); // Démarrer le chargement
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulation d'une requête réseau
+
+        // Redirection après une "connexion" réussie
+        navigation.navigate('Explore');
       } catch (error) {
-        if (isMounted) {
-          Alert.alert('Erreur', 'Une erreur s’est produite.');
-        }
+        Alert.alert('Erreur', 'Une erreur s’est produite.');
+      } finally {
+        setLoading(false); // Arrêter le chargement
       }
     }
   };
@@ -95,8 +100,9 @@ function LoginScreen({ navigation }: any) {
         <TouchableOpacity
           style={[styles.button, { marginBottom: 20 }]}
           onPress={validateForm}
+          disabled={loading} // Désactiver le bouton pendant le chargement
         >
-          <Text style={styles.buttonText}>Log in</Text>
+          <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Log in'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
@@ -113,6 +119,17 @@ export default function App() {
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Explore" component={TabTwoScreen} />
+      <Stack.Screen name="Monument" component={MonumentScreen} />
+      <Stack.Screen name="Circuit" component={CircuitScreen} />
+      <Stack.Screen name="add" component={addScreen} />
+      <Stack.Screen name="show" component={ShowMonument} />
+      <Stack.Screen name="addC" component={addScreenC} />
+      <Stack.Screen name="showC" component={ShowCircuit} />
+       
+      
+      
+      
+      
     </Stack.Navigator>
   );
 }
