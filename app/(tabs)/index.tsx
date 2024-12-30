@@ -1,14 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-  SafeAreaView,
-  ImageBackground,
-  Alert,
-} from 'react-native';
+// index.tsx
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, ImageBackground, Alert } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Supposons que TabTwoScreen soit défini ailleurs
@@ -19,38 +11,52 @@ import addScreen from './gestionmonument/add';
 import ShowMonument from './gestionmonument/show';
 import addScreenC from './gestioncircuit/addC';
 import ShowCircuit from './gestioncircuit/showC';
- 
 
-
-
-// Création du Stack Navigator
 const Stack = createStackNavigator();
 
-// Écran de connexion
 function LoginScreen({ navigation }: any) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // Ajouter un état pour charger le processus de connexion
+  const [loading, setLoading] = useState(false);
 
+  // Fonction de validation du formulaire
   const validateForm = async () => {
     if (!username || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
-    } else {
-      try {
-        setLoading(true); // Démarrer le chargement
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulation d'une requête réseau
+      return;
+    }
 
-        // Redirection après une "connexion" réussie
-        navigation.navigate('Explore');
-      } catch (error) {
-        Alert.alert('Erreur', 'Une erreur s’est produite.');
-      } finally {
-        setLoading(false); // Arrêter le chargement
+    try {
+      setLoading(true);
+
+      // Effectuer une requête POST pour vérifier les identifiants de l'utilisateur
+      const response = await fetch('http://127.0.0.1:8084/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Connexion réussie, rediriger vers l'écran Explore
+        Alert.alert('Succès', 'Connexion réussie');
+        navigation.navigate('Explore', { id: data.id, username: data.username });
+      } else {
+        // Afficher un message d'erreur en cas d'échec
+        Alert.alert('Erreur', data.error || 'Nom d\'utilisateur ou mot de passe invalide');
       }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur s’est produite.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Fonction pour gérer le mot de passe oublié
   const handleForgotPassword = () => {
     Alert.alert(
       'Mot de passe oublié',
@@ -60,9 +66,7 @@ function LoginScreen({ navigation }: any) {
 
   return (
     <ImageBackground
-      source={{
-        uri: 'https://th.bing.com/th/id/OIP.VRsbUgx4X9ieMQjjEpJNOAHaGL?w=600&h=500&rs=1&pid=ImgDetMain',
-      }}
+      source={{ uri: 'https://th.bing.com/th/id/OIP.VRsbUgx4X9ieMQjjEpJNOAHaGL?w=600&h=500&rs=1&pid=ImgDetMain' }}
       style={styles.backgroundImage}
     >
       <SafeAreaView style={styles.container}>
@@ -87,20 +91,15 @@ function LoginScreen({ navigation }: any) {
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity
-            onPress={() => setPasswordVisible(!passwordVisible)}
-            style={styles.showPassword}
-          >
-            <Text style={styles.showPasswordText}>
-              {passwordVisible ? 'Hide' : 'Show'} password
-            </Text>
+          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.showPassword}>
+            <Text style={styles.showPasswordText}>{passwordVisible ? 'Hide' : 'Show'} password</Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
           style={[styles.button, { marginBottom: 20 }]}
           onPress={validateForm}
-          disabled={loading} // Désactiver le bouton pendant le chargement
+          disabled={loading}
         >
           <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Log in'}</Text>
         </TouchableOpacity>
@@ -113,7 +112,6 @@ function LoginScreen({ navigation }: any) {
   );
 }
 
-// App principale
 export default function App() {
   return (
     <Stack.Navigator initialRouteName="Login">
@@ -125,11 +123,6 @@ export default function App() {
       <Stack.Screen name="show" component={ShowMonument} />
       <Stack.Screen name="addC" component={addScreenC} />
       <Stack.Screen name="showC" component={ShowCircuit} />
-       
-      
-      
-      
-      
     </Stack.Navigator>
   );
 }
