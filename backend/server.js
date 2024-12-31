@@ -32,25 +32,31 @@ db.connect((err) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Veuillez fournir un nom d\'utilisateur et un mot de passe.' });
+  }
+
   // Vérifier si l'utilisateur existe dans la base de données
   db.query('SELECT * FROM user WHERE username = ?', [username], (err, results) => {
     if (err) {
-      return res.status(500).json({ error: 'Erreur de base de données' });
+      console.error('Erreur de base de données :', err);
+      return res.status(500).json({ error: 'Erreur interne du serveur.' });
     }
 
     if (results.length === 0) {
-      return res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide' });
+      return res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide.' });
     }
 
     // Vérification du mot de passe
     const user = results[0];
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
-        return res.status(500).json({ error: 'Erreur lors de la vérification du mot de passe' });
+        console.error('Erreur lors de la vérification du mot de passe :', err);
+        return res.status(500).json({ error: 'Erreur interne du serveur.' });
       }
 
       if (!isMatch) {
-        return res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide' });
+        return res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide.' });
       }
 
       // Authentification réussie
@@ -60,6 +66,6 @@ app.post('/login', (req, res) => {
 });
 
 // Démarrer le serveur
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Serveur en cours d’exécution sur le port ${PORT}`);
 });
