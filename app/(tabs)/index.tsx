@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TabTwoScreen from './explore'; // Supposons que TabTwoScreen soit défini
+ import ShowCircuit from './gestioncircuit/showC';
+import addScreenC from './gestioncircuit/addC';
 
 const Stack = createStackNavigator();
 
@@ -109,8 +111,8 @@ export default function App() {
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Explore" component={TabTwoScreen} />
-      
-     
+      <Stack.Screen name="ShowCircuit" component={ShowCircuit} />
+      <Stack.Screen name="AddCircuit" component={addScreenC} />
     </Stack.Navigator>
   );
 }

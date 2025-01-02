@@ -2,20 +2,18 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import addC from './gestioncircuit/addC'; 
-import showC from './gestioncircuit/showC'; 
 export default function CircuitScreen() {
-  const navigation = useNavigation();
+ const navigation = useNavigation();
 
-  const goToAddCircuit = () => {
+ // const goToAddCircuit = () => {
     // Navigue vers la page AddCircuit
-    navigation.navigate('addC');
-  };
+ //   navigation.navigate('addScreenC');
+ // };
 
-  const goToShowCircuit = () => {
+  //const goToShowCircuit = () => {
     // Navigue vers la page ShowCircuit
-    navigation.navigate('showC');
-  };
+  //  navigation.navigate('showC');
+  //};
 
   return (
     <ImageBackground
@@ -30,7 +28,7 @@ export default function CircuitScreen() {
         {/* Boutons Supprimer, Ajouter, Modifier, Afficher */}
         <TouchableOpacity
           style={styles.button}
-          onPress={goToShowCircuit}  // Updated to call the correct function
+          onPress={() => navigation.navigate('ShowCircuit')} // Updated to call the correct function
         >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Show</Text>
@@ -38,7 +36,7 @@ export default function CircuitScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={goToAddCircuit}  // Updated to call the correct function
+          onPress={() => navigation.navigate('addScreenC')} // Updated to call the correct function
         >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Add</Text>
