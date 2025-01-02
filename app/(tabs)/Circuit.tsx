@@ -1,10 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
-
+import { useNavigation } from '@react-navigation/native';
+import addC from './gestioncircuit/addC'; 
+import showC from './gestioncircuit/showC'; 
 export default function CircuitScreen() {
-  const handleAction = (action: string) => {
-    Alert.alert(`Action: ${action}`);
+  const navigation = useNavigation();
+
+  const goToAddCircuit = () => {
+    // Navigue vers la page AddCircuit
+    navigation.navigate('addC');
+  };
+
+  const goToShowCircuit = () => {
+    // Navigue vers la page ShowCircuit
+    navigation.navigate('showC');
   };
 
   return (
@@ -20,7 +30,7 @@ export default function CircuitScreen() {
         {/* Boutons Supprimer, Ajouter, Modifier, Afficher */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleAction('showC')}
+          onPress={goToShowCircuit}  // Updated to call the correct function
         >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Show</Text>
@@ -28,13 +38,11 @@ export default function CircuitScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleAction('AddC')}
+          onPress={goToAddCircuit}  // Updated to call the correct function
         >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
-
-        
       </View>
     </ImageBackground>
   );

@@ -46,6 +46,29 @@ app.post('/login', (req, res) => {
     if (results.length === 0) {
       return res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide.' });
     }
+    //add circuit 
+    app.post('/gestioncircuit/addC', (req, res) => {
+      const { NameC, Description, Time, Distance } = req.body;
+    
+      if (!NameC || !Description || !Time || !Distance) {
+        return res.status(400).json({ error: 'Tous les champs sont requis.' });
+      }
+    
+      const newCircuit = {
+        id: circuits.length + 1,
+        NameC,
+        Description,
+        Time,
+        Distance,
+      };
+      circuits.push(newCircuit);
+  res.status(201).json({ message: 'Circuit ajouté avec succès!', circuit: newCircuit });
+});
+
+// Endpoint pour récupérer tous les circuits
+app.post('/gestioncircuit/addC', (req, res)  => {
+  res.status(200).json(circuits);
+});
 
     // Vérification du mot de passe
     const user = results[0];

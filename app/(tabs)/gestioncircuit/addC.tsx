@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground } from 'react-native';
 
@@ -26,10 +27,26 @@ const addScreenC = () => {
     });
   };
 
-  const handleSubmit = (): void => {
-    console.log('Form data:', formData);
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:8084/gestioncircuit/addC', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert('Circuit ajouté avec succès!');
+        console.log('Données enregistrées:', data);
+      } else {
+        alert(`Erreur: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi des données:', error);
+    }
   };
-
+  
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
