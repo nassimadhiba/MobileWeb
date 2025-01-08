@@ -12,11 +12,15 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native'; // Importation manquante
 import TabTwoScreen from './explore'; // Supposons que TabTwoScreen soit défini
-import ShowCircuit from './gestioncircuit/showC';
-import AddCircuitScreen from './gestioncircuit/addC';
+
 import CircuitScreen from './Circuit'; 
 import MonumentScreen from './Monument';
+
+import ShowCircuit from './gestioncircuit/showC';
+import AddCircuitScreen from './gestioncircuit/addC';
 import EditCircuit from './gestioncircuit/editC';
+
+
 import ShowCircuits from './gestioncircuit/showAll';
 
 import AddMonumentScreen  from './gestionmonument/add';
@@ -125,7 +129,7 @@ export default function App() {
   <Stack.Screen name="Circuit" component={CircuitScreen} />
   <Stack.Screen name="AddCircuit" component={AddCircuitScreen} />
   <Stack.Screen name="ShowM" component={ShowMonument} />
-  <Stack.Screen name="AddMonumentScreen " component={AddMonumentScreen } />
+  <Stack.Screen name="AddMonumentScreen " component={AddCircuitScreen} />
   
   <Stack.Screen name="EditC" component={EditCircuit} />
   <Stack.Screen name="ShowAll" component={ShowCircuits} />
