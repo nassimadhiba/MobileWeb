@@ -1,25 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert } from 'react-native';
 
 interface FormData {
-  circuitId: string;
-  monumentName: string;
-  monumentDescription: string;
-  latitude: string;
-  longitude: string;
-  imageUrl: string;
+  IDC: string;
+  Name: string;
+  Description: string;
+  ImgUrl: string;
 }
 
-const addScreen = () => {
+const AddMonumentScreen = () => {
   const [formData, setFormData] = useState<FormData>({
-    circuitId: '',
-    monumentName: '',
-    monumentDescription: '',
-    latitude: '',
-    longitude: '',
-    imageUrl: '',
+    IDC: '',
+    Name: '',
+    Description: '',
+    ImgUrl: '',
   });
 
+  // Gestion des champs du formulaire
   const handleInputChange = (name: keyof FormData, value: string): void => {
     setFormData({
       ...formData,
@@ -27,81 +24,84 @@ const addScreen = () => {
     });
   };
 
+  // Validation et soumission
   const handleSubmit = (): void => {
-    console.log('Form data:', formData);
+    if (!formData.IDC || isNaN(Number(formData.IDC))) {
+      Alert.alert('Erreur', 'IDC doit être un nombre valide.');
+      return;
+    }
+    if (!formData.Name) {
+      Alert.alert('Erreur', 'Le nom du monument est requis.');
+      return;
+    }
+    if (!formData.Description) {
+      Alert.alert('Erreur', 'La description est requise.');
+      return;
+    }
+    if (!formData.ImgUrl) {
+      Alert.alert('Erreur', "L'URL de l'image est requise.");
+      return;
+    }
+
+    console.log('Formulaire soumis:', formData);
+    Alert.alert('Succès', 'Monument ajouté avec succès!');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
-        source={{ uri: 'https://thumbs.dreamstime.com/b/jardin-jnan-sbil-parc-royal-dans-fes-avec-son-lac-et-paumes-tr%C3%A8s-hautes-fez-maroc-76513116.jpg' }} // URL de l'image de fond
+        source={{ uri: 'https://thumbs.dreamstime.com/b/jardin-jnan-sbil-parc-royal-dans-fes-avec-son-lac-et-paumes-tr%C3%A8s-hautes-fez-maroc-76513116.jpg' }}
         style={styles.background}
       >
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Add Monument</Text>
+            <Text style={styles.title}>Ajouter un Monument</Text>
 
+            {/* IDC */}
             <View style={styles.inputContainer}>
-            
               <TextInput
                 style={styles.input}
-                value={formData.circuitId}
-                onChangeText={(value) => handleInputChange('circuitId', value)}
-                placeholder="Circuit ID"
+                value={formData.IDC}
+                onChangeText={(value) => handleInputChange('IDC', value)}
+                placeholder="ID du Circuit"
+                keyboardType="numeric"
               />
             </View>
 
+            {/* Nom */}
             <View style={styles.inputContainer}>
-    
               <TextInput
                 style={styles.input}
-                value={formData.monumentName}
-                onChangeText={(value) => handleInputChange('monumentName', value)}
-                placeholder="Monument Name"
+                value={formData.Name}
+                onChangeText={(value) => handleInputChange('Name', value)}
+                placeholder="Nom du Monument"
               />
             </View>
 
+            {/* Description */}
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                value={formData.monumentDescription}
-                onChangeText={(value) => handleInputChange('monumentDescription', value)}
-                placeholder="Monument Description"
+                value={formData.Description}
+                onChangeText={(value) => handleInputChange('Description', value)}
+                placeholder="Description du Monument"
                 multiline
               />
             </View>
 
+            {/* Image URL */}
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                value={formData.latitude}
-                onChangeText={(value) => handleInputChange('latitude', value)}
-                placeholder="Latitude"
-                keyboardType="numeric"
+                value={formData.ImgUrl}
+                onChangeText={(value) => handleInputChange('ImgUrl', value)}
+                placeholder="URL de l'image"
               />
             </View>
 
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.longitude}
-                onChangeText={(value) => handleInputChange('longitude', value)}
-                placeholder="Longitude"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.imageUrl}
-                onChangeText={(value) => handleInputChange('imageUrl', value)}
-                placeholder="Image URL"
-              />
-            </View>
-
+            {/* Bouton de Soumission */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Add Monument</Text>
+              <Text style={styles.buttonText}>Ajouter Monument</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -110,6 +110,7 @@ const addScreen = () => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -118,13 +119,6 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Superposition sombre pour lisibilité
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
   scrollView: {
     flexGrow: 1,
@@ -139,25 +133,22 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   title: {
-    fontSize: 37,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#ff8500',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   inputContainer: {
     marginBottom: 15,
-  },
-  label: {
-    color: '#fff',
-    marginBottom: 5,
-    fontSize: 16,
   },
   input: {
     backgroundColor: '#fff',
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   button: {
     backgroundColor: '#FF7F24',
@@ -168,9 +159,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
 
-export default addScreen;
+export default AddMonumentScreen;

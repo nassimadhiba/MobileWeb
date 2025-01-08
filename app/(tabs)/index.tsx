@@ -8,13 +8,23 @@ import {
   SafeAreaView,
   ImageBackground,
   Alert,
-} from 'react-native';
+} from 'react-native'; 
 import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native'; // Importation manquante
 import TabTwoScreen from './explore'; // Supposons que TabTwoScreen soit défini
- import ShowCircuit from './gestioncircuit/showC';
-import addScreenC from './gestioncircuit/addC';
+import ShowCircuit from './gestioncircuit/showC';
+import AddCircuitScreen from './gestioncircuit/addC';
+import CircuitScreen from './Circuit'; 
+import MonumentScreen from './Monument';
+import EditCircuit from './gestioncircuit/editC';
+import ShowCircuits from './gestioncircuit/showAll';
+
+import AddMonumentScreen  from './gestionmonument/add';
+import ShowMonument from './gestionmonument/show';
 
 const Stack = createStackNavigator();
+
+
 
 function LoginScreen({ navigation }: any) {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -42,7 +52,6 @@ function LoginScreen({ navigation }: any) {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Succès', 'Connexion réussie');
         navigation.navigate('Explore', { id: data.id, username: data.username });
       } else {
         Alert.alert('Erreur', data.error || 'Une erreur s\'est produite');
@@ -109,13 +118,20 @@ function LoginScreen({ navigation }: any) {
 export default function App() {
   return (
     <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Explore" component={TabTwoScreen} />
-      <Stack.Screen name="ShowCircuit" component={ShowCircuit} />
-      <Stack.Screen name="AddCircuit" component={addScreenC} />
-    </Stack.Navigator>
-  );
-}
+  <Stack.Screen name="Login" component={LoginScreen} />
+  <Stack.Screen name="Explore" component={TabTwoScreen} />
+  <Stack.Screen name="VoirC" component={ShowCircuit} />
+  <Stack.Screen name="Monument" component={MonumentScreen} />
+  <Stack.Screen name="Circuit" component={CircuitScreen} />
+  <Stack.Screen name="AddCircuit" component={AddCircuitScreen} />
+  <Stack.Screen name="ShowM" component={ShowMonument} />
+  <Stack.Screen name="AddMonumentScreen " component={AddMonumentScreen } />
+  
+  <Stack.Screen name="EditC" component={EditCircuit} />
+  <Stack.Screen name="ShowAll" component={ShowCircuits} />
+</Stack.Navigator>
+
+  );}
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center' },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+/*import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground } from 'react-native';
 import { RouteProp } from '@react-navigation/native';  // Importation nécessaire pour typer les routes
 
@@ -192,4 +192,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditMonumentScreen;
+export default EditMonumentScreen;*/
+import React from 'react';
+import { View, Text } from 'react-native';
+
+const EditMonument = () => {
+  return (
+    <View>
+      <Text>Edit Monument</Text>
+    </View>
+  );
+};
+
+export default EditMonument;  // Ajoutez l'exportation par défaut ici

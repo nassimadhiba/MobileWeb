@@ -1,8 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ImageBackground } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-export default function MonumentScreen({ navigation } : any) {
+type RootStackParamList = {
+  Monument: undefined;
+  AddM: undefined;
+  ShowM: undefined;
+};
+type MonumentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Monument'>;
+
+export default function MonumentScreen() {
+    const navigation = useNavigation<MonumentScreenNavigationProp>();
   return (
     <ImageBackground
       source={{
@@ -16,7 +26,10 @@ export default function MonumentScreen({ navigation } : any) {
         {/* Boutons Supprimer, Ajouter, Modifier, Afficher */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('show')}
+          onPress={() => {
+            console.log('Navigating to ShowMonument');
+            navigation.navigate('ShowM');
+          }}
         >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Show</Text>
@@ -24,7 +37,7 @@ export default function MonumentScreen({ navigation } : any) {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('add')}
+          onPress={() => navigation.navigate('AddM')}
         >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Add</Text>

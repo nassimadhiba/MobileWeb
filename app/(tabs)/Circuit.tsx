@@ -2,18 +2,19 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+// Type de navigation
+export type RootStackParamList = {
+  Circuit: undefined;
+  AddCircuit: undefined;
+  VoirC: undefined;
+};
+
+type CircuitScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Circuit'>;
+
 export default function CircuitScreen() {
- const navigation = useNavigation();
-
- // const goToAddCircuit = () => {
-    // Navigue vers la page AddCircuit
- //   navigation.navigate('addScreenC');
- // };
-
-  //const goToShowCircuit = () => {
-    // Navigue vers la page ShowCircuit
-  //  navigation.navigate('showC');
-  //};
+  const navigation = useNavigation<CircuitScreenNavigationProp>();
 
   return (
     <ImageBackground
@@ -25,19 +26,25 @@ export default function CircuitScreen() {
       <View style={styles.overlay}>
         <Text style={styles.title}>Circuit Management</Text>
 
-        {/* Boutons Supprimer, Ajouter, Modifier, Afficher */}
+        {/* Boutons pour afficher et ajouter un circuit */}
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('ShowCircuit')} // Updated to call the correct function
-        >
+  style={styles.button}
+  onPress={() => {
+    console.log('Navigating to ShowCircuit');
+    navigation.navigate('VoirC');
+  }}
+>
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Show</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('addScreenC')} // Updated to call the correct function
-        >
+  style={styles.button}
+  onPress={() => {
+    console.log('Navigating to AddCircuit');
+    navigation.navigate('AddCircuit');
+  }}
+>
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
@@ -54,7 +61,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Superposition sombre pour lisibilité
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -71,7 +78,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '80%',
-    flexDirection: 'row', // Alignement icône + texte
+    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FF7F24',
     paddingVertical: 15,
@@ -82,7 +89,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Ombre pour Android
+    elevation: 5,
   },
   buttonText: {
     color: '#fff',

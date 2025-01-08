@@ -1,11 +1,25 @@
+// ExploreScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Assurez-vous d'installer cette bibliothèque
+import { useNavigation } from '@react-navigation/native'; // Importation du hook useNavigation
+  // Importation du type des écrans
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'; // Importation du type pour la navigation
 
-export default function ExploreScreen({ navigation }: any) {
+// Typage de l'objet navigation
+type ExploreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Explore'>;
+export type RootStackParamList = {
+  Explore: undefined;
+  Login: undefined;
+  Monument: undefined;
+  Circuit: undefined;
+};
+export default function ExploreScreen() {
+  // Utilisation du hook useNavigation avec typage
+  const navigation = useNavigation<ExploreScreenNavigationProp>();
+
   const handleLogout = () => {
-    
-    navigation.navigate('Login');
+    navigation.navigate('Login'); // Navigation vers l'écran Login
   };
 
   return (
@@ -18,25 +32,26 @@ export default function ExploreScreen({ navigation }: any) {
 
       {/* Image avec un espace en dessous */}
       <Image
-        source={{ uri: 'https://th.bing.com/th/id/OIP.vN-gMpCNIneZwv8FFw3TuAHaEo?rs=1&pid=ImgDetMain' }} // Remplacez avec l'URL correcte
+        source={{
+          uri: 'https://th.bing.com/th/id/OIP.vN-gMpCNIneZwv8FFw3TuAHaEo?rs=1&pid=ImgDetMain',
+        }}
         style={styles.image}
       />
 
       {/* Autres boutons */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Monument')}
+        onPress={() => navigation.navigate('Monument')} // Navigation vers MonumentScreen
       >
         <Text style={styles.buttonText}>Monument</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Circuit')}
+        onPress={() => navigation.navigate('Circuit')} // Navigation vers CircuitScreen
       >
         <Text style={styles.buttonText}>Circuit</Text>
       </TouchableOpacity>
-      
     </View>
   );
 }
@@ -70,7 +85,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '90%',
-    height: 300,  //add long
+    height: 300,
     marginTop: 80, // Espace au-dessus de l'image
     marginBottom: 30, // Espace en-dessous de l'image pour séparer des autres boutons
     borderRadius: 10,
