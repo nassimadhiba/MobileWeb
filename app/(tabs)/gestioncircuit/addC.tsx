@@ -33,11 +33,44 @@ const AddCircuitScreen: React.FC = () => {
 
  
   const handleSubmit = (): void => {
+    // Validate the IDC field
     if (formData.IDC === null || isNaN(formData.IDC)) {
       Alert.alert('Erreur', 'IDC doit être un nombre valide.');
       return;
     }
+  
     console.log('Form data:', formData);
+  
+    // Prepare the API call
+    fetch('http://10.0.2.2:8084/gestioncircuit/addC', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        IDC: formData.IDC,
+        Name: formData.Name,
+        Description: formData.Description,
+        Distance: formData.Distance,
+        Duration: formData.Duration,
+        ImgUrl: formData.ImgUrl,
+        Color: formData.Color,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erreur serveur. Veuillez réessayer plus tard.');
+        }
+        return response.text();
+      })
+      .then((data) => {
+        Alert.alert('Succès', 'Circuit ajouté avec succès.');
+        console.log('Server response:', data);
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la soumission:', error);
+        Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');
+      });
   };
 
   return (

@@ -1,118 +1,172 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  SafeAreaView, 
+  ImageBackground, 
+  TouchableOpacity, 
+  ActivityIndicator 
+} from 'react-native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
-// Définir l'interface pour les circuits
+// ✅ Définir les paramètres disponibles pour la navigation
+type RootStackParamList = {
+  CircuitDetails: { IDC: number };
+};
+
+type NavigationProps = NavigationProp<RootStackParamList>;
+
+// ✅ Interface pour les circuits
 interface Circuit {
-  IDC: string;
+  IDC: number;
   Name: string;
   Description: string;
-  Duration: string;
   Distance: string;
-  ImagUrl: string;
+  Duration: string;
+  ImgUrl: string;
   Color: string;
 }
 
-const ShowCircuits = () => {
-  const [circuits, setCircuits] = useState<Circuit[]>([]); // Typage explicite des circuits
+const ShowAllCircuitsScreen: React.FC = () => {
+  const [circuits, setCircuits] = useState<Circuit[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigation = useNavigation<NavigationProps>(); // ✅ Typage ajouté
 
+  // ✅ Chargement des circuits
   useEffect(() => {
-    const fetchCircuits = async () => {
-      try {
-        const response = await fetch('http://10.0.2.2:8084/gestioncircuit/showAll');
-        const data = await response.json();
-
-        if (response.ok) {
-          setCircuits(data.circuits); // Mise à jour des circuits avec les données récupérées
-        } else {
-          Alert.alert('Erreur', data.error || 'Une erreur est survenue.');
-        }
-      } catch (error) {
-        Alert.alert('Erreur réseau', 'Veuillez vérifier votre connexion et réessayer.');
-        console.error('Erreur lors de la récupération des circuits:', error);
-      } finally {
-        setLoading(false); // Fin du chargement
-      }
-    };
-
     fetchCircuits();
   }, []);
 
-  // Si les données sont en cours de chargement
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#FF7F24" />
-      </SafeAreaView>
-    );
-  }
+  const fetchCircuits = async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:8084/gestioncircuit/showAll');
+      if (!response.ok) {
+        throw new Error('Erreur réseau');
+      }
+      const data = await response.json();
+      console.log('Données récupérées:', data);
 
-  // Si aucun circuit n'est trouvé
-  if (circuits.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.message}>Aucun circuit trouvé.</Text>
-      </SafeAreaView>
-    );
-  }
+      const filteredCircuits = data.filter((circuit: any) => 
+        circuit.Distance && circuit.ImgUrl
+      );
+      setCircuits(filteredCircuits);
+    } catch (error) {
+      console.error('Erreur lors du chargement des circuits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Rendu de la liste des circuits
+  const renderCircuitCard = ({ item }: { item: Circuit }) => (
+    <TouchableOpacity onPress={() => {
+      console.log('🧭 Navigation vers CircuitDetails avec IDC:', item.IDC);
+      navigation.navigate('CircuitDetails', { IDC: item.IDC });
+
+    }}>
+      <View style={[styles.card, { borderColor: item.Color || '#ccc' }]}>
+        <ImageBackground
+          source={{ uri: item.ImgUrl || 'https://via.placeholder.com/150' }}
+          style={styles.imageBackground}
+          imageStyle={styles.imageBorderRadius}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.cardTitle}>{item.Name}</Text>
+            <Text style={styles.cardText}>🏃 Distance: {item.Distance} km</Text>
+            <Text style={styles.cardText}>⏱️ Durée: {item.Duration}</Text>
+            <Text style={styles.cardDescription}>{item.Description}</Text>
+          </View>
+        </ImageBackground>
+      </View>
+    </TouchableOpacity>
+  );
+  
+  // ✅ Rendu principal
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={circuits}
-        keyExtractor={(item) => item.IDC.toString()} // L'attribut IDC est maintenant bien reconnu
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.title}>{item.Name}</Text>
-            <Text style={styles.description}>{item.Description}</Text>
-            <Text style={styles.details}>Durée: {item.Duration}</Text>
-            <Text style={styles.details}>Distance: {item.Distance}</Text>
-            <Text style={styles.details}>Couleur: {item.Color}</Text>
-          </View>
-        )}
-      />
+      <Text style={styles.title}>🌟 Circuits Disponibles</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#FF7F24" />
+      ) : circuits.length === 0 ? (
+        <Text style={styles.noData}>Aucun circuit disponible</Text>
+      ) : (
+        <FlatList
+          data={circuits}
+          keyExtractor={(item) => item.IDC.toString()}
+          renderItem={renderCircuitCard}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </SafeAreaView>
   );
 };
 
+// ✅ Styles améliorés
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F9FAFC',
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#FF7F24',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  noData: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#888',
+    marginTop: 20,
+  },
+  list: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    borderRadius: 15,
+    marginBottom: 15,
+    overflow: 'hidden',
+    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    borderWidth: 1,
   },
-  title: {
-    fontSize: 18,
+  imageBackground: {
+    height: 220,
+    justifyContent: 'flex-end',
+  },
+  imageBorderRadius: {
+    borderRadius: 15,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    padding: 15,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+  },
+  cardTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF7F24',
+    color: '#fff',
+    marginBottom: 5,
   },
-  description: {
-    fontSize: 16,
-    marginVertical: 5,
-    color: '#333',
-  },
-  details: {
+  cardText: {
     fontSize: 14,
-    color: '#666',
+    color: '#fff',
+    marginBottom: 3,
   },
-  message: {
-    fontSize: 18,
-    color: '#FF7F24',
-    textAlign: 'center',
-    marginTop: 20,
+  cardDescription: {
+    fontSize: 12,
+    color: '#EEE',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });
 
-export default ShowCircuits;
+export default ShowAllCircuitsScreen;

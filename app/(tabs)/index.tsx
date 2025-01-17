@@ -9,24 +9,47 @@ import {
   ImageBackground,
   Alert,
 } from 'react-native'; 
+import { enableScreens } from 'react-native-screens';
+import { useNavigation } from '@react-navigation/native';
+
+type RootStackParamList = {
+  Login: undefined;
+  Explore: { id: number; username: string };
+  CircuitDetails: { IDC: number };
+  Monument: undefined;
+  Circuit: undefined;
+  AddCircuit: undefined;
+  ShowM: undefined;
+  AddMonumentScreen: undefined; // ✅ Assurez-vous que cela existe
+  EditC: undefined;
+  ShowAllCircuitsScreen: undefined;
+};
+
+
+
+enableScreens(false);
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native'; // Importation manquante
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabTwoScreen from './explore'; // Supposons que TabTwoScreen soit défini
 
 import CircuitScreen from './Circuit'; 
 import MonumentScreen from './Monument';
 
-import ShowCircuit from './gestioncircuit/showC';
+import CircuitDetailsScreen from './gestioncircuit/showC';
 import AddCircuitScreen from './gestioncircuit/addC';
 import EditCircuit from './gestioncircuit/editC';
 
 
-import ShowCircuits from './gestioncircuit/showAll';
+import  ShowAllCircuitsScreen from './gestioncircuit/showAll';
 
 import AddMonumentScreen  from './gestionmonument/add';
 import ShowMonument from './gestionmonument/show';
 
-const Stack = createStackNavigator();
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+ 
 
 
 
@@ -124,15 +147,26 @@ export default function App() {
     <Stack.Navigator initialRouteName="Login">
   <Stack.Screen name="Login" component={LoginScreen} />
   <Stack.Screen name="Explore" component={TabTwoScreen} />
-  <Stack.Screen name="VoirC" component={ShowCircuit} />
+  <Stack.Screen 
+  name="CircuitDetails" 
+  component={CircuitDetailsScreen} 
+  options={{ title: 'Détails du Circuit' }} 
+/>
+
+
   <Stack.Screen name="Monument" component={MonumentScreen} />
   <Stack.Screen name="Circuit" component={CircuitScreen} />
   <Stack.Screen name="AddCircuit" component={AddCircuitScreen} />
   <Stack.Screen name="ShowM" component={ShowMonument} />
-  <Stack.Screen name="AddMonumentScreen " component={AddCircuitScreen} />
-  
+  <Stack.Screen name="AddMonumentScreen" component={AddCircuitScreen} />
   <Stack.Screen name="EditC" component={EditCircuit} />
-  <Stack.Screen name="ShowAll" component={ShowCircuits} />
+
+
+  <Stack.Screen 
+        name="ShowAllCircuitsScreen" 
+        component={ShowAllCircuitsScreen} 
+        options={{ animation: 'none', title: 'Tous les Circuits' }} 
+      />
 </Stack.Navigator>
 
   );}

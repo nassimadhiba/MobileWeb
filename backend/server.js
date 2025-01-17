@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+ 
 
 const app = express();
 const PORT = 8084;
@@ -102,24 +103,59 @@ app.put('/gestioncircuit/editC/:IDC', (req, res) => {
     res.status(200).json({ message: 'Circuit modifié avec succès!' });
   });
 });
-// Route pour afficher tous les circuits
+// 📌 Route pour récupérer tous les circuits
 app.get('/gestioncircuit/showAll', (req, res) => {
   const query = 'SELECT * FROM circuit';
-
   db.query(query, (err, results) => {
     if (err) {
       console.error('Erreur lors de la récupération des circuits:', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+      return;
+    }
+    res.json(results);
+  });
+});
+app.get('/gestioncircuit/:IDC', (req, res) => {
+  const { IDC } = req.params;
+  console.log('Route GET /gestioncircuit/:IDC appelée avec IDC:', IDC);
+
+  if (!IDC) {
+    return res.status(400).json({ error: 'IDC valide est requis.' });
+  }
+
+  const query = 'SELECT * FROM circuit WHERE IDC = ?';
+
+  db.query(query, [IDC], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération du circuit:', err);
       return res.status(500).json({ error: 'Erreur serveur.' });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Aucun circuit trouvé.' });
+      console.log('❌ Aucun circuit trouvé avec IDC:', IDC);
+      return res.status(404).json({ error: 'Circuit non trouvé.' });
     }
 
-    res.status(200).json({ circuits: results });
+    console.log('✅ Circuit trouvé:', results[0]);
+    res.json(results[0]);
   });
 });
 
+
+// Route pour ajouter un monument
+app.post('/gestionmonument/add', (req, res) => {
+  const { IDC, IDM, Name, Description, ImgUrl } = req.body;
+  const sql = 'INSERT INTO monument (IDC, IDM, Name, Description, ImgUrl) VALUES (?, ?, ?, ?, ?)';
+  
+  db.query(sql, [IDC, IDM, Name, Description, ImgUrl], (err, result) => {
+    if (err) {
+      console.error('Erreur lors de l’insertion:', err);
+      return res.status(500).json({ message: 'Erreur serveur', error: err.message });
+    }
+
+    res.status(200).json({ message: 'Monument ajouté avec succès', result });
+  });
+}); 
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Serveur en cours d'exécution sur le port ${PORT}`);
