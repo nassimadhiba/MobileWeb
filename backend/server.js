@@ -141,21 +141,20 @@ app.get('/gestioncircuit/:IDC', (req, res) => {
   });
 });
 
-
-// Route pour ajouter un monument
 app.post('/gestionmonument/add', (req, res) => {
-  const { IDC, IDM, Name, Description, ImgUrl } = req.body;
-  const sql = 'INSERT INTO monument (IDC, IDM, Name, Description, ImgUrl) VALUES (?, ?, ?, ?, ?)';
-  
-  db.query(sql, [IDC, IDM, Name, Description, ImgUrl], (err, result) => {
+  const { IDC, IDM, Name, Descreption, ImgUrl } = req.body;
+  const sql = 'INSERT INTO monument (IDC, IDM, Name, Descreption, ImgUrl) VALUES (?, ?, ?, ?, ?)';
+
+  db.query(sql, [IDC, IDM, Name, Descreption, ImgUrl], (err, result) => {
     if (err) {
-      console.error('Erreur lors de l’insertion:', err);
+      console.error('Erreur lors de l’insertion:', err); // Log l'erreur complète
       return res.status(500).json({ message: 'Erreur serveur', error: err.message });
     }
-
     res.status(200).json({ message: 'Monument ajouté avec succès', result });
   });
-}); 
+});
+
+
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Serveur en cours d'exécution sur le port ${PORT}`);

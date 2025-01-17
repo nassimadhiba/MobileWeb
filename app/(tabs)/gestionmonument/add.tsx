@@ -5,7 +5,7 @@ interface FormData {
   IDC: number | null; // ID du circuit associé
   IDM: number | null; // ID unique pour le monument
   Name: string;
-  Description: string;
+  Descreption: string;
   ImgUrl: string;
 }
 
@@ -14,7 +14,7 @@ const AddMonumentScreen: React.FC = () => {
     IDC: null,
     IDM: null,
     Name: '',
-    Description: '',
+    Descreption: '',
     ImgUrl: '',
   });
 
@@ -28,7 +28,7 @@ const AddMonumentScreen: React.FC = () => {
 
   // Validation et soumission
   const handleSubmit = (): void => {
-    const { IDC, IDM, Name, Description, ImgUrl } = formData;
+    const { IDC, IDM, Name, Descreption, ImgUrl } = formData;
   
     if (IDC === null || isNaN(IDC)) {
       Alert.alert('Erreur', 'IDC doit être un entier valide.');
@@ -42,7 +42,7 @@ const AddMonumentScreen: React.FC = () => {
       Alert.alert('Erreur', 'Le nom du monument est requis.');
       return;
     }
-    if (!Description.trim()) {
+    if (!Descreption.trim()) {
       Alert.alert('Erreur', 'La description est requise.');
       return;
     }
@@ -59,7 +59,7 @@ const AddMonumentScreen: React.FC = () => {
         IDC: formData.IDC,
         IDM: formData.IDM,
         Name: formData.Name,
-        Description: formData.Description,
+        Descreption: formData.Descreption,
         ImgUrl: formData.ImgUrl,
       }),
     })
@@ -73,10 +73,10 @@ const AddMonumentScreen: React.FC = () => {
         Alert.alert('Succès', 'Monument ajouté avec succès.');
         console.log('Réponse du serveur :', data);
       })
-      .catch((error) => {
-       console.error('Erreur lors de la soumission:', error);
-        Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');;
-      });
+     .catch((error) => {
+  console.error('Erreur lors de la soumission:', error);
+  Alert.alert('Erreur', `Une erreur est survenue : ${error.message}`);
+});
   };
   
   return (
@@ -110,14 +110,14 @@ const AddMonumentScreen: React.FC = () => {
             </View>
 
             {/* Autres champs */}
-            {(['Name', 'Description', 'ImgUrl'] as (keyof FormData)[]).map((field) => (
+            {(['Name', 'Descreption', 'ImgUrl'] as (keyof FormData)[]).map((field) => (
               <View style={styles.inputContainer} key={field}>
                 <TextInput
                   style={styles.input}
                   value={formData[field]?.toString()}
                   onChangeText={(value) => handleInputChange(field, value)}
-                  placeholder={field === 'Name' ? 'Nom du Monument' : field === 'Description' ? 'Description' : "URL de l'image"}
-                  multiline={field === 'Description'}
+                  placeholder={field === 'Name' ? 'Nom du Monument' : field === 'Descreption' ? 'Descreption' : "URL de l'image"}
+                  multiline={field === 'Descreption'}
                 />
               </View>
             ))}
