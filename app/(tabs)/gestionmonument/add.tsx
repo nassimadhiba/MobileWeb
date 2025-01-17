@@ -29,7 +29,7 @@ const AddMonumentScreen: React.FC = () => {
   // Validation et soumission
   const handleSubmit = (): void => {
     const { IDC, IDM, Name, Descreption, ImgUrl } = formData;
-  
+
     if (IDC === null || isNaN(IDC)) {
       Alert.alert('Erreur', 'IDC doit être un entier valide.');
       return;
@@ -50,7 +50,16 @@ const AddMonumentScreen: React.FC = () => {
       Alert.alert('Erreur', "L'URL de l'image est requise.");
       return;
     }
+
+    // Vérification du format de l'URL de l'image
+    const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|svg|webp))$/;
+    if (!urlPattern.test(ImgUrl)) {
+      Alert.alert('Erreur', "L'URL de l'image n'est pas valide.");
+      return;
+    }
+
     console.log('Form data:', formData);
+
     // Requête POST
     fetch('http://10.0.2.2:8084/gestionmonument/add', {
       method: 'POST',
@@ -73,12 +82,12 @@ const AddMonumentScreen: React.FC = () => {
         Alert.alert('Succès', 'Monument ajouté avec succès.');
         console.log('Réponse du serveur :', data);
       })
-     .catch((error) => {
-  console.error('Erreur lors de la soumission:', error);
-  Alert.alert('Erreur', `Une erreur est survenue : ${error.message}`);
-});
+      .catch((error) => {
+        console.error('Erreur lors de la soumission:', error);
+        Alert.alert('Erreur', `Une erreur est survenue : ${error.message}`);
+      });
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -116,7 +125,7 @@ const AddMonumentScreen: React.FC = () => {
                   style={styles.input}
                   value={formData[field]?.toString()}
                   onChangeText={(value) => handleInputChange(field, value)}
-                  placeholder={field === 'Name' ? 'Nom du Monument' : field === 'Descreption' ? 'Descreption' : "URL de l'image"}
+                  placeholder={field === 'Name' ? 'Nom du Monument' : field === 'Descreption' ? 'Description' : "URL de l'image"}
                   multiline={field === 'Descreption'}
                 />
               </View>

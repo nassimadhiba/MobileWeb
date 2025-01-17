@@ -141,8 +141,12 @@ app.get('/gestioncircuit/:IDC', (req, res) => {
   });
 });
 
+
 app.post('/gestionmonument/add', (req, res) => {
   const { IDC, IDM, Name, Descreption, ImgUrl } = req.body;
+
+  console.log('Données reçues pour insertion:', req.body); // Log les données reçues
+
   const sql = 'INSERT INTO monument (IDC, IDM, Name, Descreption, ImgUrl) VALUES (?, ?, ?, ?, ?)';
 
   db.query(sql, [IDC, IDM, Name, Descreption, ImgUrl], (err, result) => {
@@ -153,6 +157,7 @@ app.post('/gestionmonument/add', (req, res) => {
     res.status(200).json({ message: 'Monument ajouté avec succès', result });
   });
 });
+
 
 
 
