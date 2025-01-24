@@ -1,83 +1,137 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  ImageBackground,
+  Alert,
+  ActivityIndicator
+} from 'react-native';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface FormData {
-  IDC: string;
+  IDC: number | null;
   Name: string;
   Description: string;
-  Duration: string;
   Distance: string;
-  ImagUrl: string;
+  Duration: string;
+  ImgUrl: string;
   Color: string;
 }
 
-const EditCircuit = ({ route, navigation }: any) => {
+interface RouteParams {
+  circuitId: number;
+}
+
+type EditCircuitScreenProps = {
+  route: RouteProp<{ EditCircuit: RouteParams }, 'EditCircuit'>;
+  navigation: StackNavigationProp<any>;
+};
+
+const EditCircuitScreen: React.FC<EditCircuitScreenProps> = ({ route, navigation }) => {
+  const { circuitId } = route.params;
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    IDC: '',
+    IDC: null,
     Name: '',
     Description: '',
-    Duration: '',
     Distance: '',
-    ImagUrl: '',
+    Duration: '',
+    ImgUrl: '',
     Color: '',
   });
 
   useEffect(() => {
-    const { IDC } = route.params;
-    // Fetch the current data of the circuit to edit
-    fetch(`http://10.0.2.2:8084/gestioncircuit/${IDC}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setFormData({
-          IDC: data.IDC,
-          Name: data.Name,
-          Description: data.Description,
-          Duration: data.Duration,
-          Distance: data.Distance,
-          ImagUrl: data.ImagUrl,
-          Color: data.Color,
-        });
-      })
-      .catch((error) => {
-        Alert.alert('Erreur', 'Impossible de charger les données du circuit.');
-        console.error('Erreur lors de la récupération des données:', error);
+    fetchCircuitData();
+  }, [circuitId]);
+
+  const fetchCircuitData = async () => {
+    try {
+      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${circuitId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch circuit data');
+      }
+      const data = await response.json();
+      setFormData({
+        IDC: data.IDC,
+        Name: data.Name,
+        Description: data.Description,
+        Distance: data.Distance,
+        Duration: data.Duration,
+        ImgUrl: data.ImgUrl,
+        Color: data.Color,
       });
-  }, []);
+    } catch (error) {
+      console.error('Error fetching circuit:', error);
+      Alert.alert('Error', 'Failed to load circuit data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (name: keyof FormData, value: string): void => {
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === 'IDC' ? parseInt(value) || null : value,
     });
   };
 
-  const handleSubmit = async () => {
-    const { IDC, Name, Description, Duration, Distance, ImagUrl, Color } = formData;
-
-    if (!IDC || !Name || !Description || !Duration || !Distance || !ImagUrl || !Color) {
-      Alert.alert('Erreur', 'Tous les champs sont requis.');
-      return;
+  const validateForm = (): boolean => {
+    if (!formData.IDC || isNaN(formData.IDC)) {
+      Alert.alert('Error', 'IDC must be a valid number');
+      return false;
     }
+    if (!formData.Name.trim()) {
+      Alert.alert('Error', 'Name is required');
+      return false;
+    }
+    return true;
+  };
 
+  const handleSubmit = async (): Promise<void> => {
+    if (!validateForm()) return;
+
+    setIsSaving(true);
     try {
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/editC/${IDC}`, {
+      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/editC/${circuitId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        Alert.alert('Succès', 'Circuit modifié avec succès!');
-        navigation.goBack(); // Return to the previous screen
-      } else {
-        const data = await response.json();
-        Alert.alert('Erreur', data.error || 'Une erreur est survenue.');
+      if (!response.ok) {
+        throw new Error('Failed to update circuit');
       }
+
+      Alert.alert('Success', 'Circuit updated successfully', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     } catch (error) {
-      Alert.alert('Erreur réseau', 'Veuillez vérifier votre connexion et réessayer.');
-      console.error('Erreur lors de l\'envoi des données:', error);
+      console.error('Error updating circuit:', error);
+      Alert.alert('Error', 'Failed to update circuit');
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF7F24" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,85 +141,47 @@ const EditCircuit = ({ route, navigation }: any) => {
       >
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Modifier un Circuit</Text>
+            <Text style={styles.title}>Edit Circuit</Text>
 
-            {/* Champ pour IDC */}
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                value={formData.IDC}
+                value={formData.IDC?.toString() || ''}
                 onChangeText={(value) => handleInputChange('IDC', value)}
-                placeholder="IDC (Identifiant du circuit)"
+                placeholder="IDC (Number)"
                 keyboardType="numeric"
-                editable={false}
+                editable={false} // IDC shouldn't be editable in edit mode
               />
             </View>
 
-            {/* Champ pour Name */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.Name}
-                onChangeText={(value) => handleInputChange('Name', value)}
-                placeholder="Nom du circuit"
-              />
-            </View>
+            {(['Name', 'Description', 'Distance', 'Duration', 'ImgUrl', 'Color'] as (keyof FormData)[]).map((field) => (
+              <View style={styles.inputContainer} key={field}>
+                <TextInput
+                  style={styles.input}
+                  value={formData[field]?.toString()}
+                  onChangeText={(value) => handleInputChange(field, value)}
+                  placeholder={field}
+                  multiline={field === 'Description'}
+                  keyboardType={['Distance', 'Duration'].includes(field) ? 'numeric' : 'default'}
+                />
+              </View>
+            ))}
 
-            {/* Champ pour Description */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.Description}
-                onChangeText={(value) => handleInputChange('Description', value)}
-                placeholder="Description"
-                multiline
-              />
-            </View>
+            <TouchableOpacity 
+              style={[styles.button, isSaving && styles.disabledButton]} 
+              onPress={handleSubmit}
+              disabled={isSaving}
+            >
+              <Text style={styles.buttonText}>
+                {isSaving ? 'Updating...' : 'Update Circuit'}
+              </Text>
+            </TouchableOpacity>
 
-            {/* Champ pour Duration */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.Duration}
-                onChangeText={(value) => handleInputChange('Duration', value)}
-                placeholder="Durée (ex: 2h)"
-              />
-            </View>
-
-            {/* Champ pour Distance */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.Distance}
-                onChangeText={(value) => handleInputChange('Distance', value)}
-                placeholder="Distance (ex: 2.5 Km)"
-                keyboardType="numeric"
-              />
-            </View>
-
-            {/* Champ pour ImagUrl */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.ImagUrl}
-                onChangeText={(value) => handleInputChange('ImagUrl', value)}
-                placeholder="URL de l'image"
-              />
-            </View>
-
-            {/* Champ pour Color */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.Color}
-                onChangeText={(value) => handleInputChange('Color', value)}
-                placeholder="Couleur (ex: #FF0000 ou red)"
-              />
-            </View>
-
-            {/* Bouton de soumission */}
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Modifier le Circuit</Text>
+            <TouchableOpacity 
+              style={[styles.cancelButton]} 
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -177,6 +193,11 @@ const EditCircuit = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   background: {
     flex: 1,
@@ -193,14 +214,15 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 500,
     padding: 20,
-    marginVertical: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#ff8500',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   inputContainer: {
     marginBottom: 15,
@@ -210,6 +232,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2,
   },
   button: {
     backgroundColor: '#FF7F24',
@@ -217,13 +246,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc',
+  },
+  cancelButton: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#FF7F24',
+  },
+  cancelButtonText: {
+    color: '#FF7F24',
+    fontSize: 20,
     fontWeight: 'bold',
   },
 });
 
-export default EditCircuit;
-
+export default EditCircuitScreen;

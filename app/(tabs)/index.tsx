@@ -34,15 +34,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabTwoScreen from './explore'; // Supposons que TabTwoScreen soit défini
 
 import CircuitScreen from './Circuit'; 
-import MonumentScreen from './Monument';
-
 import CircuitDetailsScreen from './gestioncircuit/showC';
 import AddCircuitScreen from './gestioncircuit/addC';
 import EditCircuit from './gestioncircuit/editC';
+import ShowAllCircuitsScreen from './gestioncircuit/showAll';
 
 
-import  ShowAllCircuitsScreen from './gestioncircuit/showAll';
-
+import ShowAlMonumentsScreen from './gestionmonument/showAl';
+import MonumentScreen from './Monument';
 import AddMonumentScreen  from './gestionmonument/add';
 import ShowMonument from './gestionmonument/show';
 
@@ -68,7 +67,7 @@ function LoginScreen({ navigation }: any) {
     try {
       setLoading(true);
 
-      const response = await fetch('http://10.0.2.2:8084/login', {
+      const response = await fetch('http://localhost:8084/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,26 +146,37 @@ export default function App() {
     <Stack.Navigator initialRouteName="Login">
   <Stack.Screen name="Login" component={LoginScreen} />
   <Stack.Screen name="Explore" component={TabTwoScreen} />
+
   <Stack.Screen 
   name="CircuitDetails" 
   component={CircuitDetailsScreen} 
   options={{ title: 'Détails du Circuit' }} 
 />
-
-
-  <Stack.Screen name="Monument" component={MonumentScreen} />
-  <Stack.Screen name="Circuit" component={CircuitScreen} />
+<Stack.Screen name="Circuit" component={CircuitScreen} />
   <Stack.Screen name="AddCircuit" component={AddCircuitScreen} />
-  <Stack.Screen name="ShowM" component={ShowMonument} />
-  <Stack.Screen name="AddMonumentScreen" component={AddCircuitScreen} />
   <Stack.Screen name="EditC" component={EditCircuit} />
-
-
   <Stack.Screen 
         name="ShowAllCircuitsScreen" 
         component={ShowAllCircuitsScreen} 
         options={{ animation: 'none', title: 'Tous les Circuits' }} 
-      />
+  />
+
+
+
+<Stack.Screen 
+  name="MonumentDetails" 
+  component={ShowMonument} 
+  options={{ title: 'Détails du Monument' }} 
+/>
+<Stack.Screen 
+        name="ShowAlMonumentsScreen" 
+        component={ShowAlMonumentsScreen} 
+        options={{ animation: 'none', title: 'Tous les Monuments' }} 
+  />
+  <Stack.Screen name="Monument" component={MonumentScreen} />
+  <Stack.Screen name="AddMonumentScreen" component={AddCircuitScreen} />
+
+  
 </Stack.Navigator>
 
   );}

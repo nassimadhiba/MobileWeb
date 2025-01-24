@@ -11,7 +11,7 @@ type CircuitDetailsRouteProp = RouteProp<RootStackParamList, 'CircuitDetails'>;
 interface Circuit {
   IDC: number;
   Name: string;
-  Description: string;
+  Descreption: string;
   Distance: string;
   Duration: string;
   ImgUrl: string;
@@ -28,9 +28,9 @@ const CircuitDetailsScreen: React.FC = () => {
     const fetchCircuitDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du circuit avec IDC:', IDC);
-        const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/${IDC}`);
+        const response = await fetch('http://192.168.56.1:8084/gestioncircuit/${IDC}');
         if (!response.ok) {
-          throw new Error(`Erreur réseau: ${response.status}`);
+          throw new Error('Erreur réseau: ${response.status}');
         }
         const data = await response.json();
         console.log('✅ Détails récupérés:', data);
@@ -62,8 +62,8 @@ const CircuitDetailsScreen: React.FC = () => {
       />
       <Text style={styles.title}>{circuit.Name}</Text>
       <Text style={styles.text}>🏃 Distance: {circuit.Distance} km</Text>
-      <Text style={styles.text}>⏱️ Durée: {circuit.Duration}</Text>
-      <Text style={styles.text}>📝 Description: {circuit.Description}</Text>
+      <Text style={styles.text}>⏱ Durée: {circuit.Duration}</Text>
+      <Text style={styles.text}>📝 Description: {circuit.Descreption}</Text>
     </ScrollView>
   );
 };

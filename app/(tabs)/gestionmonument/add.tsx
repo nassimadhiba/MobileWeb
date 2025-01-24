@@ -51,13 +51,13 @@ const AddMonumentScreen: React.FC = () => {
       return;
     }
 
-    // Vérification du format de l'URL de l'image
+    /* Vérification du format de l'URL de l'image
     const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|svg|webp))$/;
     if (!urlPattern.test(ImgUrl)) {
       Alert.alert('Erreur', "L'URL de l'image n'est pas valide.");
       return;
     }
-
+*/
     console.log('Form data:', formData);
 
     // Requête POST
@@ -133,7 +133,7 @@ const AddMonumentScreen: React.FC = () => {
 
             {/* Bouton de soumission */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Ajouter Monument</Text>
+              <Text style={styles.buttonText}>Add Monument</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

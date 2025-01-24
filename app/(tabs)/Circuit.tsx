@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Circuit: undefined;
   AddCircuit: undefined;
-  VoirC: undefined;
+  ShowAllCircuitsScreen: undefined;
 };
 
 type CircuitScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Circuit'>;
@@ -31,7 +31,7 @@ export default function CircuitScreen() {
   style={styles.button}
   onPress={() => {
     console.log('Navigating to ShowCircuit');
-    navigation.navigate('VoirC');
+    navigation.navigate('ShowAllCircuitsScreen');
   }}
 >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />

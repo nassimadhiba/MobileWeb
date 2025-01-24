@@ -1,24 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  SafeAreaView, 
-  ImageBackground, 
-  TouchableOpacity, 
-  ActivityIndicator 
-} from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-// ✅ Définir les paramètres disponibles pour la navigation
-type RootStackParamList = {
-  CircuitDetails: { IDC: number };
-};
-
-type NavigationProps = NavigationProp<RootStackParamList>;
-
-// ✅ Interface pour les circuits
 interface Circuit {
   IDC: number;
   Name: string;
@@ -32,26 +15,20 @@ interface Circuit {
 const ShowAllCircuitsScreen: React.FC = () => {
   const [circuits, setCircuits] = useState<Circuit[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigation = useNavigation<NavigationProps>(); // ✅ Typage ajouté
+  const navigation = useNavigation();
 
-  // ✅ Chargement des circuits
   useEffect(() => {
     fetchCircuits();
   }, []);
 
   const fetchCircuits = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8084/gestioncircuit/showAll');
+      const response = await fetch('http://192.168.56.1:8084/gestioncircuit/showAll');
       if (!response.ok) {
         throw new Error('Erreur réseau');
       }
       const data = await response.json();
-      console.log('Données récupérées:', data);
-
-      const filteredCircuits = data.filter((circuit: any) => 
-        circuit.Distance && circuit.ImgUrl
-      );
-      setCircuits(filteredCircuits);
+      setCircuits(data);
     } catch (error) {
       console.error('Erreur lors du chargement des circuits:', error);
     } finally {
@@ -60,11 +37,7 @@ const ShowAllCircuitsScreen: React.FC = () => {
   };
 
   const renderCircuitCard = ({ item }: { item: Circuit }) => (
-    <TouchableOpacity onPress={() => {
-      console.log('🧭 Navigation vers CircuitDetails avec IDC:', item.IDC);
-      navigation.navigate('CircuitDetails', { IDC: item.IDC });
-
-    }}>
+    <TouchableOpacity onPress={() => navigation.navigate('CircuitDetails', { IDC: item.IDC })}>
       <View style={[styles.card, { borderColor: item.Color || '#ccc' }]}>
         <ImageBackground
           source={{ uri: item.ImgUrl || 'https://via.placeholder.com/150' }}
@@ -74,15 +47,14 @@ const ShowAllCircuitsScreen: React.FC = () => {
           <View style={styles.overlay}>
             <Text style={styles.cardTitle}>{item.Name}</Text>
             <Text style={styles.cardText}>🏃 Distance: {item.Distance} km</Text>
-            <Text style={styles.cardText}>⏱️ Durée: {item.Duration}</Text>
+            <Text style={styles.cardText}>⏱ Durée: {item.Duration}</Text>
             <Text style={styles.cardDescription}>{item.Description}</Text>
           </View>
         </ImageBackground>
       </View>
     </TouchableOpacity>
   );
-  
-  // ✅ Rendu principal
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>🌟 Circuits Disponibles</Text>
@@ -101,8 +73,6 @@ const ShowAllCircuitsScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-// ✅ Styles améliorés
 const styles = StyleSheet.create({
   container: {
     flex: 1,
