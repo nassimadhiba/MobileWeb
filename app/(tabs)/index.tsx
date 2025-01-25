@@ -23,6 +23,8 @@ type RootStackParamList = {
   AddMonumentScreen: undefined; // ✅ Assurez-vous que cela existe
   EditC: undefined;
   ShowAllCircuitsScreen: undefined;
+  ShowAlMonumentsScreen :undefined;
+   
 };
 
 
@@ -43,7 +45,8 @@ import ShowAllCircuitsScreen from './gestioncircuit/showAll';
 import ShowAlMonumentsScreen from './gestionmonument/showAl';
 import MonumentScreen from './Monument';
 import AddMonumentScreen  from './gestionmonument/add';
-import ShowMonument from './gestionmonument/show';
+import MonumentDetailsScreen from './gestionmonument/show';
+import EditMonumentScreen from './gestionmonument/edit';
 
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -67,7 +70,7 @@ function LoginScreen({ navigation }: any) {
     try {
       setLoading(true);
 
-      const response = await fetch('http://localhost:8084/login', {
+      const response = await fetch('http://10.0.2.2:8084/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -165,7 +168,7 @@ export default function App() {
 
 <Stack.Screen 
   name="MonumentDetails" 
-  component={ShowMonument} 
+  component={MonumentDetailsScreen} 
   options={{ title: 'Détails du Monument' }} 
 />
 <Stack.Screen 
@@ -174,7 +177,8 @@ export default function App() {
         options={{ animation: 'none', title: 'Tous les Monuments' }} 
   />
   <Stack.Screen name="Monument" component={MonumentScreen} />
-  <Stack.Screen name="AddMonumentScreen" component={AddCircuitScreen} />
+  <Stack.Screen name="AddMonumentScreen" component={AddMonumentScreen} />
+  <Stack.Screen name="Edit" component={EditMonumentScreen} />
 
   
 </Stack.Navigator>

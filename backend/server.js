@@ -76,26 +76,57 @@ app.post('/gestioncircuit/addC', (req, res) => {
 });
 
  
-// Update circuit
-app.put('/editC/:id', (req, res) => {
-  const { Name, Description, Distance, Duration, ImgUrl, Color } = req.body;
-  const query = 'UPDATE circuits SET Name = ?, Description = ?, Distance = ?, Duration = ?, ImgUrl = ?, Color = ? WHERE IDC = ?';
-  
-  db.query(query, [Name, Description, Distance, Duration, ImgUrl, Color, req.params.id], (err, result) => {
+// Route pour modifier un circuit par ID
+app.put('/gestioncircuit/editC/:IDC', (req, res) => {
+  const { IDC } = req.params;
+  const { Name, Descreption, Distance, Duration, ImgUrl, Color } = req.body;
+
+  console.log('Route PUT /gestioncircuit/editC appelée pour ID:', IDC);
+
+  const query = `
+    UPDATE circuit
+    SET Name = ?, Descreption = ?, Distance = ?, Duration = ?, ImgUrl = ?, Color = ?
+    WHERE IDC = ?
+  `;
+
+  db.query(query, [Name, Descreption, Distance, Duration, ImgUrl, Color, IDC], (err, result) => {
     if (err) {
-      console.error('Error updating circuit:', err);
-      return res.status(500).json({ error: 'Error updating circuit' });
+      console.error('Erreur lors de la modification du circuit:', err);
+      return res.status(500).json({ error: 'Erreur serveur.' });
     }
+
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Circuit not found' });
+      console.log('❌ Aucun circuit trouvé avec IDC:', IDC);
+      return res.status(404).json({ error: 'Circuit non trouvé.' });
     }
-    res.json({ message: 'Circuit updated successfully' });
+
+    console.log('✅ Circuit modifié avec succès:', result);
+    res.json({ message: 'Circuit modifié avec succès.' });
   });
 });
+ 
+app.delete('/gestioncircuit/deleteC/:IDC', (req, res) => {
+  const circuitId = req.params.IDC;
+  
+  // Exemple de vérification si le circuit existe
+  if (!circuitExists(circuitId)) {
+    return res.status(404).send('Circuit non trouvé');
+  }
+
+  // Logique de suppression
+  res.send('Circuit supprimé');
+});
+
+
+
+
 
 
 // Route pour récupérer tous les circuits
 app.get('/gestioncircuit/showAll', (req, res) => {
+  console.log('/gestioncircuit/showAll');
+
+
   const query = 'SELECT * FROM circuit';
   db.query(query, (err, results) => {
     if (err) {
@@ -109,18 +140,35 @@ app.get('/gestioncircuit/showAll', (req, res) => {
 
 // Route pour récupérer un circuit par ID
 // Route pour récupérer les détails d'un circuit par son ID
-app.get('/gestioncircuit/showC/:id', (req, res) => {
-  const { id } = req.params;
-  db.query('SELECT * FROM circuits WHERE IDC = ?', [id], (err, results) => {
+app.get('/gestioncircuit/showC/:IDC', (req, res) => {
+  const { IDC } = req.params;
+  console.log('Route GET /gestioncircuit/:IDC appelée avec IDC:', IDC);
+
+  if (!IDC) {
+    return res.status(400).json({ error: 'IDC valide est requis.' });
+  }
+
+  const query = 'SELECT * FROM circuit WHERE IDC = ?';
+
+  db.query(query, [IDC], (err, results) => {
     if (err) {
-      res.status(500).json({ message: 'Erreur lors de la récupération des détails' });
-    } else if (results.length === 0) {
-      res.status(404).json({ message: 'Circuit non trouvé' });
-    } else {
-      res.json({ success: true, data: results[0] });
+      console.error('Erreur lors de la récupération du circuit:', err);
+      return res.status(500).json({ error: 'Erreur serveur.' });
     }
+
+    if (results.length === 0) {
+      console.log('❌ Aucun circuit trouvé avec IDC:', IDC);
+      return res.status(404).json({ error: 'Circuit non trouvé.' });
+    }
+
+    console.log('✅ Circuit trouvé:', results[0]);
+    res.json(results[0]);
   });
 });
+
+
+
+
 
 app.post('/gestionmonument/add', (req, res) => {
   const { IDC, IDM, Name, Descreption, ImgUrl } = req.body;
@@ -149,6 +197,66 @@ app.get('/gestionmonument/showAl', (req, res) => {
       return;
     }
     res.json(results);
+  });
+});
+
+app.get('/gestionmonument/show/:IDM', (req, res) => {
+  const { IDM } = req.params; 
+  console.log('Route GET /gestionmonumnent/:IDM appelée avec IDM:', IDM);
+
+  if (!IDM) {
+    return res.status(400).json({ error: 'IDM valide est requis.' });
+  }
+
+  const query = 'SELECT * FROM monument WHERE IDM = ?';
+
+  db.query(query, [IDM], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération du monument:', err);
+      return res.status(500).json({ error: 'Erreur serveur.' });
+    }
+
+    if (results.length === 0) {
+      console.log('❌ Aucun monument trouvé avec IDM:', IDM);
+      return res.status(404).json({ error: 'Monument non trouvé.' });
+    }
+
+    console.log('✅ Monument trouvé:', results[0]);
+    res.json(results[0]);
+  });
+});
+
+app.put('/gestionmonument/edit/:IDM', (req, res) => {
+  const { IDM } = req.params; // Récupérer l'IDM du paramètre de l'URL
+  const { IDC, Name, Descreption, ImgUrl } = req.body; // Récupérer les données du body de la requête
+
+  console.log('Route PUT /gestionmonument/edit appelée pour IDM:', IDM);
+
+  // Validation de l'IDM
+  if (!IDM) {
+    return res.status(400).json({ error: 'IDM manquant ou invalide' });
+  }
+
+  // La requête SQL pour mettre à jour un monument, en utilisant l'IDM pour l'identification
+  const query = `
+    UPDATE monument
+    SET IDC = ?, Name = ?, Descreption = ?, ImgUrl = ?
+    WHERE IDM = ?
+  `;
+  console.log(`Executing query: ${query}`);
+  db.query(query, [IDC, Name, Descreption, ImgUrl, IDM], (err, result) => {
+    if (err) {
+      console.error('Erreur lors de la modification du monument:', err);
+      return res.status(500).json({ error: 'Erreur serveur.' });
+    }
+
+    if (result.affectedRows === 0) {
+      console.log('❌ Aucun monument trouvé avec IDM:', IDM);
+      return res.status(404).json({ error: 'Monument non trouvé.' });
+    }
+
+    console.log('✅ Monument modifié avec succès:', result);
+    res.json({ message: 'Monument modifié avec succès.' });
   });
 });
 

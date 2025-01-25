@@ -1,207 +1,253 @@
-/*import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground } from 'react-native';
-import { RouteProp } from '@react-navigation/native';  // Importation nécessaire pour typer les routes
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import Modal from 'react-native-modal';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-// Définition de FormData
-interface FormData {
-  circuitId: string;
-  monumentName: string;
-  monumentDescription: string;
-  latitude: string;
-  longitude: string;
-  imageUrl: string;
-}
-
-// Définition des types de navigation
+// Types for navigation
 type RootStackParamList = {
-  EditMonument: { monument: FormData };
-  // autres écrans...
+  MonumentDetails: { IDM: number };
+  EditMonument: { IDM: number };
 };
 
-// Typage de EditScreenProps
-interface EditScreenProps {
-  route: RouteProp<RootStackParamList, 'EditMonument'>;
+type MonumentDetailsRouteProp = RouteProp<RootStackParamList, 'EditMonument'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'EditMonument'>;
+
+// Interface for Monument
+interface Monument {
+  IDC: number | null;
+  IDM: number | null;
+  Name: string;
+  Descreption: string;
+  ImgUrl: string;
 }
 
-const EditMonumentScreen: React.FC<EditScreenProps> = ({ route }) => {
-  const { monument } = route.params;  // Récupérer les paramètres
-  const [formData, setFormData] = useState<FormData>(monument);
+const EditMonumentScreen: React.FC = () => {
+  const route = useRoute<MonumentDetailsRouteProp>();
+  const { IDM } = route.params;
+  const navigation = useNavigation<NavigationProp>();
+
+  const [monument, setMonument] = useState<Monument | null>(null);
+  const [name, setName] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [imgUrl, setImgUrl] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
-    setFormData(monument);  // Remplir les champs avec les données du monument
-  }, [monument]);
+    const fetchMonumentDetails = async () => {
+      try {
+        const response = await fetch(`http://10.0.2.2:8084/gestionmonument/show/${IDM}`);
+        if (!response.ok) {
+          throw new Error(`Erreur réseau: ${response.status}`);
+        }
+        const data: Monument = await response.json();
+        setMonument(data);
+        setName(data.Name);
+        setDescription(data.Descreption);
+        setImgUrl(data.ImgUrl);
+      } catch (error) {
+        showModal('Erreur', 'Impossible de charger les détails du monument.');
+      }
+    };
 
-  // Gérer la modification des champs du formulaire
-  const handleInputChange = (name: keyof FormData, value: string): void => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    fetchMonumentDetails();
+  }, [IDM]);
+
+  const showModal = (title: string, message: string) => {
+    setModalMessage(message);
+    setModalVisible(true);
   };
 
-  // Gérer la soumission du formulaire
-  const handleSubmit = async (): Promise<void> => {
-    console.log('Updated Monument:', formData);
-    // Logique pour mettre à jour le monument
-    // Vous pouvez envoyer les données à une API pour la mise à jour
+  const handleSave = async () => {
+    if (!name || !description || !imgUrl) {
+      showModal('Erreur', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
     try {
-      // Exemple d'appel à une API (adaptez selon vos besoins)
-      const response = await fetch('https://votre-api.com/updateMonument', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        alert('Monument updated successfully');
-      } else {
-        alert('Error updating monument');
+      const updatedMonument = {
+        IDC: monument?.IDC,
+        IDM: monument?.IDM,
+        Name: name,
+        Descreption: description,
+        ImgUrl: imgUrl,
+      };
+
+      if (!IDM) {
+        showModal('Erreur', 'IDM est manquant');
+        return;
       }
+
+      const response = await fetch(`http://10.0.2.2:8084/gestionmonument/edit/${IDM}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedMonument),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la mise à jour: ${response.status}`);
+      }
+
+      showModal('Succès', 'Monument mis à jour avec succès');
+
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
     } catch (error) {
-      console.error('Error updating monument:', error);
-      alert('An error occurred while updating the monument');
+      showModal('Erreur', 'Une erreur est survenue lors de la mise à jour.');
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
       <ImageBackground
-        source={{ uri: 'https://thumbs.dreamstime.com/b/jardin-jnan-sbil-parc-royal-dans-fes-avec-son-lac-et-paumes-tr%C3%A8s-hautes-fez-maroc-76513116.jpg' }} // URL de l'image de fond
-        style={styles.background}
+        source={{ uri: imgUrl || 'https://via.placeholder.com/300' }}
+        style={styles.headerImage}
       >
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>Modify Monument</Text>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.circuitId}
-                onChangeText={(value) => handleInputChange('circuitId', value)}
-                placeholder="Circuit ID"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.monumentName}
-                onChangeText={(value) => handleInputChange('monumentName', value)}
-                placeholder="Monument Name"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.monumentDescription}
-                onChangeText={(value) => handleInputChange('monumentDescription', value)}
-                placeholder="Monument Description"
-                multiline
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.latitude}
-                onChangeText={(value) => handleInputChange('latitude', value)}
-                placeholder="Latitude"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.longitude}
-                onChangeText={(value) => handleInputChange('longitude', value)}
-                placeholder="Longitude"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.imageUrl}
-                onChangeText={(value) => handleInputChange('imageUrl', value)}
-                placeholder="Image URL"
-              />
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Update Monument</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+        <View style={styles.overlay}>
+          <Text style={styles.headerTitle}>Modifier le monument</Text>
+        </View>
       </ImageBackground>
-    </SafeAreaView>
+
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Nom du monument</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Nom du monument"
+        />
+
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.input}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Description du monument"
+          multiline
+        />
+
+        <Text style={styles.label}>URL de l'image</Text>
+        <TextInput
+          style={styles.input}
+          value={imgUrl}
+          onChangeText={setImgUrl}
+          placeholder="URL de l'image du monument"
+        />
+
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <MaterialIcons name="save" size={20} color="white" />
+          <Text style={styles.saveButtonText}>Sauvegarder</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        onBackButtonPress={() => setModalVisible(false)}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>{modalMessage}</Text>
+          <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  background: {
+  headerImage: {
+    width: '100%',
+    height: 200,
+  },
+  overlay: {
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  scrollView: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-end',
     padding: 20,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#f9dcc4',
   },
   formContainer: {
-    width: '100%',
-    maxWidth: 500,
     padding: 20,
-    marginVertical: 30,
   },
-  title: {
-    fontSize: 37,
+  label: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#ff8500',
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  inputContainer: {
-    marginBottom: 15,
+    color: '#333',
+    marginVertical: 10,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 10,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     fontSize: 16,
+    marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#FF7F24',
-    padding: 15,
-    borderRadius: 10,
+  saveButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#226f54',
+    borderRadius: 12,
   },
-  buttonText: {
-    color: '#fff',
+  saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 22,
+    borderRadius: 12,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 18,
+  },
+  modalButton: {
+    backgroundColor: '#1D4ED8',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+  },
+  modalButtonText: {
+    color: '#FFF',
+    fontSize: 18,
   },
 });
 
-export default EditMonumentScreen;*/
-import React from 'react';
-import { View, Text } from 'react-native';
-
-const EditMonument = () => {
-  return (
-    <View>
-      <Text>Edit Monument</Text>
-    </View>
-  );
-};
-
-export default EditMonument;  // Ajoutez l'exportation par défaut ici
+export default EditMonumentScreen;

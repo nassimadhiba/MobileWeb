@@ -23,7 +23,7 @@ const ShowAllCircuitsScreen: React.FC = () => {
 
   const fetchCircuits = async () => {
     try {
-      const response = await fetch('http://192.168.56.1:8084/gestioncircuit/showAll');
+      const response = await fetch('http://10.0.2.2:8084/gestioncircuit/showAll');
       if (!response.ok) {
         throw new Error('Erreur réseau');
       }

@@ -6,8 +6,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 type RootStackParamList = {
   Monument: undefined;
-  AddM: undefined;
-  ShowM: undefined;
+  AddMonumentScreen: undefined;
+  ShowAlMonumentsScreen: undefined;
 };
 type MonumentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Monument'>;
 
@@ -28,7 +28,7 @@ export default function MonumentScreen() {
           style={styles.button}
           onPress={() => {
             console.log('Navigating to ShowMonument');
-            navigation.navigate('ShowM');
+            navigation.navigate('ShowAlMonumentsScreen');
           }}
         >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
@@ -37,7 +37,7 @@ export default function MonumentScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('AddM')}
+          onPress={() => navigation.navigate('AddMonumentScreen')}
         >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Add</Text>

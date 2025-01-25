@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, ImageBackground, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { blue } from 'react-native-reanimated/lib/typescript/Colors';
 
 interface Monument {
   IDC: number;
@@ -12,8 +11,7 @@ interface Monument {
 }
 
 const ShowAlMonumentsScreen: React.FC = () => {
-  const [monuments, setmonuments] = useState<Monument[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [monuments, setMonuments] = useState<Monument[]>([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -27,11 +25,9 @@ const ShowAlMonumentsScreen: React.FC = () => {
         throw new Error('Erreur réseau');
       }
       const data = await response.json();
-      setmonuments(data);
+      setMonuments(data);
     } catch (error) {
-      console.error('Erreur lors du chargement des monument:', error);
-    } finally {
-      setLoading(false);
+      console.error('Erreur lors du chargement des monuments:', error);
     }
   };
 
@@ -45,7 +41,7 @@ const ShowAlMonumentsScreen: React.FC = () => {
         >
           <View style={styles.overlay}>
             <Text style={styles.cardTitle}>{item.Name}</Text>
-            <Text style={styles.cardDescription}>{item.Descreption}</Text>
+             
           </View>
         </ImageBackground>
       </View>
@@ -55,14 +51,12 @@ const ShowAlMonumentsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>🌟 Monuments Disponibles</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#FF7F24" />
-      ) : monuments.length === 0 ? (
+      {monuments.length === 0 ? (
         <Text style={styles.noData}>Aucun monument disponible</Text>
       ) : (
         <FlatList
           data={monuments}
-          keyExtractor={(item) => item.IDC.toString()}
+          keyExtractor={(item) => item.IDM.toString()}
           renderItem={renderMonumentCard}
           contentContainerStyle={styles.list}
         />
@@ -70,6 +64,7 @@ const ShowAlMonumentsScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -122,11 +117,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 5,
-  },
-  cardText: {
-    fontSize: 14,
-    color: '#fff',
-    marginBottom: 3,
   },
   cardDescription: {
     fontSize: 12,

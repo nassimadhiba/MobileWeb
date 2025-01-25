@@ -1,278 +1,229 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  ImageBackground,
-  Alert,
-  ActivityIndicator
-} from 'react-native';
-import { RouteProp } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import Modal from 'react-native-modal';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-interface FormData {
-  IDC: number | null;
+type RootStackParamList = {
+  CircuitDetails: { IDC: number };
+  EditC: { IDC: number };
+};
+
+type EditCRouteProp = RouteProp<RootStackParamList, 'EditC'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'EditC'>;
+
+interface Circuit {
+  IDC: number;
   Name: string;
-  Description: string;
+  Descreption: string;
   Distance: string;
   Duration: string;
   ImgUrl: string;
   Color: string;
 }
 
-interface RouteParams {
-  circuitId: number;
-}
+const EditCircuitScreen: React.FC = () => {
+  const route = useRoute<EditCRouteProp>();
+  const { IDC } = route.params;
+  const navigation = useNavigation<NavigationProp>();
 
-type EditCircuitScreenProps = {
-  route: RouteProp<{ EditCircuit: RouteParams }, 'EditCircuit'>;
-  navigation: StackNavigationProp<any>;
-};
-
-const EditCircuitScreen: React.FC<EditCircuitScreenProps> = ({ route, navigation }) => {
-  const { circuitId } = route.params;
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    IDC: null,
-    Name: '',
-    Description: '',
-    Distance: '',
-    Duration: '',
-    ImgUrl: '',
-    Color: '',
-  });
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [distance, setDistance] = useState('');
+  const [duration, setDuration] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
-    fetchCircuitData();
-  }, [circuitId]);
-
-  const fetchCircuitData = async () => {
-    try {
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${circuitId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch circuit data');
+    const fetchCircuitDetails = async () => {
+      try {
+        const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${IDC}`);
+        const data = await response.json();
+        setName(data.Name);
+        setDescription(data.Descreption);
+        setDistance(data.Distance);
+        setDuration(data.Duration);
+        setImgUrl(data.ImgUrl);
+      } catch (error) {
+        showModal('Erreur', "Impossible de charger les détails du circuit.");
       }
-      const data = await response.json();
-      setFormData({
-        IDC: data.IDC,
-        Name: data.Name,
-        Description: data.Description,
-        Distance: data.Distance,
-        Duration: data.Duration,
-        ImgUrl: data.ImgUrl,
-        Color: data.Color,
-      });
-    } catch (error) {
-      console.error('Error fetching circuit:', error);
-      Alert.alert('Error', 'Failed to load circuit data');
-    } finally {
-      setIsLoading(false);
-    }
+    };
+    fetchCircuitDetails();
+  }, [IDC]);
+
+  const showModal = (title: string, message: string) => {
+    setModalMessage(message);
+    setModalVisible(true);
   };
 
-  const handleInputChange = (name: keyof FormData, value: string): void => {
-    setFormData({
-      ...formData,
-      [name]: name === 'IDC' ? parseInt(value) || null : value,
-    });
-  };
-
-  const validateForm = (): boolean => {
-    if (!formData.IDC || isNaN(formData.IDC)) {
-      Alert.alert('Error', 'IDC must be a valid number');
-      return false;
+  const handleSave = async () => {
+    if (!name || !description || !distance || !duration || !imgUrl) {
+      showModal('Erreur', 'Tous les champs doivent être remplis.');
+      return;
     }
-    if (!formData.Name.trim()) {
-      Alert.alert('Error', 'Name is required');
-      return false;
-    }
-    return true;
-  };
 
-  const handleSubmit = async (): Promise<void> => {
-    if (!validateForm()) return;
-
-    setIsSaving(true);
     try {
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/editC/${circuitId}`, {
+      await fetch(`http://10.0.2.2:8084/gestioncircuit/editC/${IDC}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Name: name,
+          Descreption: description,
+          Distance: distance,
+          Duration: duration,
+          ImgUrl: imgUrl,
+        }),
       });
+      showModal('Succès', 'Les informations ont été mises à jour.');
 
-      if (!response.ok) {
-        throw new Error('Failed to update circuit');
-      }
-
-      Alert.alert('Success', 'Circuit updated successfully', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
-    } catch (error) {
-      console.error('Error updating circuit:', error);
-      Alert.alert('Error', 'Failed to update circuit');
-    } finally {
-      setIsSaving(false);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000); // Attendre 2 secondes avant de revenir
+    } catch {
+      showModal('Erreur', "Une erreur est survenue lors de la mise à jour.");
     }
   };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF7F24" />
-      </View>
-    );
-  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ImageBackground
-        source={{ uri: 'https://thumbs.dreamstime.com/b/jardin-jnan-sbil-parc-royal-dans-fes-avec-son-lac-et-paumes-tr%C3%A8s-hautes-fez-maroc-76513116.jpg' }}
-        style={styles.background}
-      >
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>Edit Circuit</Text>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={formData.IDC?.toString() || ''}
-                onChangeText={(value) => handleInputChange('IDC', value)}
-                placeholder="IDC (Number)"
-                keyboardType="numeric"
-                editable={false} // IDC shouldn't be editable in edit mode
-              />
-            </View>
-
-            {(['Name', 'Description', 'Distance', 'Duration', 'ImgUrl', 'Color'] as (keyof FormData)[]).map((field) => (
-              <View style={styles.inputContainer} key={field}>
-                <TextInput
-                  style={styles.input}
-                  value={formData[field]?.toString()}
-                  onChangeText={(value) => handleInputChange(field, value)}
-                  placeholder={field}
-                  multiline={field === 'Description'}
-                  keyboardType={['Distance', 'Duration'].includes(field) ? 'numeric' : 'default'}
-                />
-              </View>
-            ))}
-
-            <TouchableOpacity 
-              style={[styles.button, isSaving && styles.disabledButton]} 
-              onPress={handleSubmit}
-              disabled={isSaving}
-            >
-              <Text style={styles.buttonText}>
-                {isSaving ? 'Updating...' : 'Update Circuit'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.cancelButton]} 
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+    <ScrollView style={styles.container}>
+      <ImageBackground source={{ uri: imgUrl }} style={styles.headerImage}>
+        <View style={styles.overlay}>
+          <Text style={styles.headerTitle}>Modifier le circuit</Text>
+        </View>
       </ImageBackground>
-    </SafeAreaView>
+
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nom"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Distance"
+          value={distance}
+          onChangeText={setDistance}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Durée"
+          value={duration}
+          onChangeText={setDuration}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="URL de l'image"
+          value={imgUrl}
+          onChangeText={setImgUrl}
+        />
+
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                  <MaterialIcons name="save" size={20} color="white" />
+                  <Text style={styles.saveButtonText}>Sauvegarder</Text>
+                </TouchableOpacity>
+      </View>
+
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        onBackButtonPress={() => setModalVisible(false)}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>{modalMessage}</Text>
+          <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  loadingContainer: {
+  headerImage: {
+    width: '100%',
+    height: 200,
+  },
+  overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  scrollView: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-end',
     padding: 20,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#f9dcc4',
   },
   formContainer: {
-    width: '100%',
-    maxWidth: 500,
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#ff8500',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 15,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 10,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 2,
+    marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#FF7F24',
-    padding: 15,
-    borderRadius: 10,
+  saveButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 15,
+    backgroundColor: '#226f54',
+    borderRadius: 12,
   },
-  buttonText: {
-    color: '#fff',
+  saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 22,
+    borderRadius: 12,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 18,
   },
-  disabledButton: {
-    backgroundColor: '#cccccc',
+  modalButton: {
+    backgroundColor: '#1D4ED8',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 6,
   },
-  cancelButton: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#FF7F24',
-  },
-  cancelButtonText: {
-    color: '#FF7F24',
-    fontSize: 20,
-    fontWeight: 'bold',
+  modalButtonText: {
+    color: '#FFF',
+    fontSize: 18,
   },
 });
 

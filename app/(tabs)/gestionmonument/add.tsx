@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert } from 'react-native';
 
 interface FormData {
-  IDC: number | null; // ID du circuit associé
-  IDM: number | null; // ID unique pour le monument
+  IDC: number | null; 
+  IDM: number | null;  
   Name: string;
   Descreption: string;
   ImgUrl: string;
@@ -18,11 +18,10 @@ const AddMonumentScreen: React.FC = () => {
     ImgUrl: '',
   });
 
-  // Gestion des champs du formulaire
   const handleInputChange = (name: keyof FormData, value: string): void => {
     setFormData({
       ...formData,
-      [name]: ['IDC', 'IDM'].includes(name) ? parseInt(value) || null : value,
+      [name]: name === 'IDM' ? parseInt(value) || null : value, // Conversion en entier pour IDC
     });
   };
 
@@ -51,14 +50,9 @@ const AddMonumentScreen: React.FC = () => {
       return;
     }
 
-    /* Vérification du format de l'URL de l'image
-    const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|svg|webp))$/;
-    if (!urlPattern.test(ImgUrl)) {
-      Alert.alert('Erreur', "L'URL de l'image n'est pas valide.");
-      return;
-    }
-*/
     console.log('Form data:', formData);
+
+
 
     // Requête POST
     fetch('http://10.0.2.2:8084/gestionmonument/add', {
@@ -143,16 +137,19 @@ const AddMonumentScreen: React.FC = () => {
 };
 
 // Styles
+
+// ✅ Styles du formulaire
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { flex: 1, resizeMode: 'cover', justifyContent: 'center' },
   scrollView: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  formContainer: { width: '100%', maxWidth: 500, padding: 20, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 10 },
+  formContainer: { width: '100%', maxWidth: 500, padding: 20 },
   title: { fontSize: 30, fontWeight: 'bold', color: '#ff8500', textAlign: 'center', marginBottom: 20 },
   inputContainer: { marginBottom: 15 },
-  input: { backgroundColor: '#fff', borderRadius: 5, padding: 10, fontSize: 16, borderWidth: 1, borderColor: '#ccc' },
+  input: { backgroundColor: '#fff', borderRadius: 5, padding: 10, fontSize: 16 },
   button: { backgroundColor: '#FF7F24', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 20 },
   buttonText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
 });
+
 
 export default AddMonumentScreen;
