@@ -79,7 +79,7 @@ const EditCircuitScreen: React.FC = () => {
       showModal('Succès', 'Les informations ont été mises à jour.');
 
       setTimeout(() => {
-        navigation.goBack();
+        navigation.navigate('CircuitDetails', { IDC: IDC })
       }, 2000); // Attendre 2 secondes avant de revenir
     } catch {
       showModal('Erreur', "Une erreur est survenue lors de la mise à jour.");
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   modalButton: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#166534',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 6,

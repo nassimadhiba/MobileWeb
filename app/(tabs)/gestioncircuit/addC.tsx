@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
- 
 interface FormData {
-  IDC: number | null; 
+  IDC: number | null;
   Name: string;
   Description: string;
   Distance: string;
@@ -12,8 +12,8 @@ interface FormData {
   Color: string;
 }
 
- 
 const AddCircuitScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState<FormData>({
     IDC: null,
     Name: '',
@@ -23,25 +23,23 @@ const AddCircuitScreen: React.FC = () => {
     ImgUrl: '',
     Color: '',
   });
- 
+  const [modalVisible, setModalVisible] = useState(false);
+
   const handleInputChange = (name: keyof FormData, value: string): void => {
     setFormData({
       ...formData,
-      [name]: name === 'IDC' ? parseInt(value) || null : value, // Conversion en entier pour IDC
+      [name]: name === 'IDC' ? parseInt(value) || null : value,
     });
   };
 
- 
   const handleSubmit = (): void => {
-    // Validate the IDC field
     if (formData.IDC === null || isNaN(formData.IDC)) {
       Alert.alert('Erreur', 'IDC doit être un nombre valide.');
       return;
     }
-  
+
     console.log('Form data:', formData);
-  
-    // Prepare the API call
+
     fetch('http://10.0.2.2:8084/gestioncircuit/addC', {
       method: 'POST',
       headers: {
@@ -64,7 +62,7 @@ const AddCircuitScreen: React.FC = () => {
         return response.text();
       })
       .then((data) => {
-        Alert.alert('Succès', 'Circuit ajouté avec succès.');
+        setModalVisible(true); // Afficher la modal après un ajout réussi
         console.log('Server response:', data);
       })
       .catch((error) => {
@@ -81,9 +79,8 @@ const AddCircuitScreen: React.FC = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Add Circuit</Text>
+            <Text style={styles.title}>Ajouter un Circuit</Text>
 
-            
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
@@ -94,8 +91,7 @@ const AddCircuitScreen: React.FC = () => {
               />
             </View>
 
-            
-            {(['Name', 'Description', 'Distance', 'Duration', 'ImgUrl', 'Color'] as (keyof FormData)[]).map((field) => (
+            {(['Nom', 'Description', 'Distance', 'Durée', 'URL de l image', 'Couleur'] as (keyof FormData)[]).map((field) => (
               <View style={styles.inputContainer} key={field}>
                 <TextInput
                   style={styles.input}
@@ -109,16 +105,40 @@ const AddCircuitScreen: React.FC = () => {
             ))}
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Add Circuit</Text>
+              <Text style={styles.buttonText}>Ajouter</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </ImageBackground>
+
+      {/* Modal pour afficher le message de succès */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Circuit ajouté avec succès!</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+                navigation.navigate('ShowAllCircuitsScreen'); // Naviguer vers l'écran ShowAllCircuitsScreen après fermeture de la modal
+              }}
+            >
+              <Text style={styles.buttonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
-// ✅ Styles du formulaire
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { flex: 1, resizeMode: 'cover', justifyContent: 'center' },
@@ -129,6 +149,32 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderRadius: 5, padding: 10, fontSize: 16 },
   button: { backgroundColor: '#FF7F24', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 20 },
   buttonText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
+  },
 });
 
 export default AddCircuitScreen;

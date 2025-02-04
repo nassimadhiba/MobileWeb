@@ -14,12 +14,12 @@ import Modal from 'react-native-modal';
 
 // Définition des types pour la navigation
 type RootStackParamList = {
-  MonumentDetail: { IDM: number }; // Route avec l'IDM pour identifier le monument
- 
+  MonumentDetails: { IDM: number }; // Route avec l'IDM pour identifier le monument
+  Edit: { IDM: number };
 };
 
-type MonumentDetailsRouteProp = RouteProp<RootStackParamList, 'MonumentDetail'>;
-type NavigationProp = StackNavigationProp<RootStackParamList, 'MonumentDetail'>;
+type MonumentDetailsRouteProp = RouteProp<RootStackParamList, 'MonumentDetails'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'MonumentDetails'>;
 
 // Définition de l'interface Monument
 interface Monument {
@@ -30,7 +30,7 @@ interface Monument {
   ImgUrl: string;
 }
 
-const MonumentDetail: React.FC = () => {
+const MonumentDetailsScreen: React.FC = () => {
   const route = useRoute<MonumentDetailsRouteProp>();
   const { IDM } = route.params;
   const navigation = useNavigation<NavigationProp>();
@@ -39,10 +39,10 @@ const MonumentDetail: React.FC = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchMonumentDetail = async () => {
+    const fetchMonumentDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du monument avec IDM:', IDM);
-        const response = await fetch(`http://10.0.2.2:8084/client/monument/${IDM}`);
+        const response = await fetch(`http://10.0.2.2:3000/gestionmonument/show/${IDM}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }
@@ -54,9 +54,10 @@ const MonumentDetail: React.FC = () => {
       }
     };
 
-    fetchMonumentDetail();
+    fetchMonumentDetails();
   }, [IDM]);
 
+  
   if (!monument) {
     return <Text style={styles.errorText}>Détails du monument introuvables.</Text>;
   }
@@ -76,8 +77,11 @@ const MonumentDetail: React.FC = () => {
           <Text style={styles.description}>{monument.Descreption}</Text>
         </View>
 
+         
  
+         
       </View>
+
        
     </ScrollView>
   );
@@ -124,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MonumentDetail;
+export default MonumentDetailsScreen;

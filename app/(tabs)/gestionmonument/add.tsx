@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, ImageBackground, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  ImageBackground,
+  Alert,
+  Modal,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 interface FormData {
-  IDC: number | null; 
-  IDM: number | null;  
+  IDC: number | null;
+  IDM: number | null;
   Name: string;
   Descreption: string;
   ImgUrl: string;
 }
 
 const AddMonumentScreen: React.FC = () => {
+  const navigation = useNavigation(); // Utilisez useNavigation pour la navigation
   const [formData, setFormData] = useState<FormData>({
     IDC: null,
     IDM: null,
@@ -17,11 +30,12 @@ const AddMonumentScreen: React.FC = () => {
     Descreption: '',
     ImgUrl: '',
   });
+  const [isModalVisible, setIsModalVisible] = useState(false); // État pour la visibilité de la modal
 
   const handleInputChange = (name: keyof FormData, value: string): void => {
     setFormData({
       ...formData,
-      [name]: name === 'IDM' ? parseInt(value) || null : value, // Conversion en entier pour IDC
+      [name]: name === 'IDM' || name === 'IDC' ? parseInt(value) || null : value, // Conversion en entier pour IDC et IDM
     });
   };
 
@@ -52,8 +66,6 @@ const AddMonumentScreen: React.FC = () => {
 
     console.log('Form data:', formData);
 
-
-
     // Requête POST
     fetch('http://10.0.2.2:8084/gestionmonument/add', {
       method: 'POST',
@@ -73,13 +85,18 @@ const AddMonumentScreen: React.FC = () => {
         return response.text();
       })
       .then((data) => {
-        Alert.alert('Succès', 'Monument ajouté avec succès.');
+        setIsModalVisible(true); // Afficher la modal après un ajout réussi
         console.log('Réponse du serveur :', data);
       })
       .catch((error) => {
         console.error('Erreur lors de la soumission:', error);
         Alert.alert('Erreur', `Une erreur est survenue : ${error.message}`);
       });
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Fermer la modal
+    navigation.navigate('ShowAlMonumentsScreen'); // Rediriger vers la page des monuments
   };
 
   return (
@@ -127,18 +144,34 @@ const AddMonumentScreen: React.FC = () => {
 
             {/* Bouton de soumission */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Add Monument</Text>
+              <Text style={styles.buttonText}>Ajouter</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </ImageBackground>
+
+      {/* Boîte de dialogue modale */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleModalClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Succès</Text>
+            <Text style={styles.modalMessage}>Le monument a été ajouté avec succès.</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={handleModalClose}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 // Styles
-
-// ✅ Styles du formulaire
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { flex: 1, resizeMode: 'cover', justifyContent: 'center' },
@@ -149,7 +182,45 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderRadius: 5, padding: 10, fontSize: 16 },
   button: { backgroundColor: '#FF7F24', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 20 },
   buttonText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-});
 
+  // Styles pour la modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#FF7F24',
+    padding: 10,
+    borderRadius: 5,
+    width: '50%',
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 export default AddMonumentScreen;

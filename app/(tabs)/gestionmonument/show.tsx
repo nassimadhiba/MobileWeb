@@ -65,13 +65,14 @@ const MonumentDetailsScreen: React.FC = () => {
   const handleDelete = async () => {
     try {
       console.log('Suppression du monument IDM:', monument?.IDM);
-      await fetch(`http://10.0.2.2:8084/gestionmonument/deleteM/${monument?.IDM}`, {
+      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/deleteM/${monument?.IDM}`, {
         method: 'DELETE',
       });
 
+      
       console.log('✅ Monument supprimé avec succès');
       setIsDeleteModalVisible(false); // Ferme le modal après suppression
-      navigation.goBack(); // Retour à l'écran précédent après la suppression
+      navigation.navigate('ShowAlMonumentsScreen');
     } catch (error) {
       console.error('❌ Erreur lors de la suppression du monument:', error);
     }

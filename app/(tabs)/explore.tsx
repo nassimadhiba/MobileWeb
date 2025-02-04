@@ -27,7 +27,7 @@ export default function ExploreScreen() {
       {/* Bouton de déconnexion en haut de la page */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <Icon name="log-out-outline" size={20} color="#FFF" style={styles.icon} />
-        <Text style={styles.logoutText}>Log Out</Text>
+        <Text style={styles.logoutText}>Déconnexion</Text>
       </TouchableOpacity>
 
       {/* Image avec un espace en dessous */}

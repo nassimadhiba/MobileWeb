@@ -104,23 +104,29 @@ app.put('/gestioncircuit/editC/:IDC', (req, res) => {
     res.json({ message: 'Circuit modifié avec succès.' });
   });
 });
- 
+
+
 app.delete('/gestioncircuit/deleteC/:IDC', (req, res) => {
   const circuitId = req.params.IDC;
+  console.log(`Tentative de suppression du circuit avec IDC: ${circuitId}`);  // Log pour déboguer
   
-  // Exemple de vérification si le circuit existe
-  if (!circuitExists(circuitId)) {
-    return res.status(404).send('Circuit non trouvé');
+  
+
+  // Suppression du circuit
+//  circuits = circuits.filter((c) => c.IDC !== parseInt(circuitId));
+const query = 'DELETE FROM circuit WHERE IDC = ?';
+
+db.query(query, [circuitId], (err, results) => {
+  if (err) {
+    console.error('Erreur lors de la Suppression du circuit:', err);
+    return res.status(500).json({ error: 'Erreur serveur.' });
   }
+} )
 
-  // Logique de suppression
-  res.send('Circuit supprimé');
+  console.log(`Circuit supprimé avec IDC: ${circuitId}`);  // Log pour confirmer suppression
+
+  return res.send('Circuit supprimé avec succès');
 });
-
-
-
-
-
 
 // Route pour récupérer tous les circuits
 app.get('/gestioncircuit/showAll', (req, res) => {
@@ -260,6 +266,29 @@ app.put('/gestionmonument/edit/:IDM', (req, res) => {
   });
 });
 
+
+app.delete('/gestionmonument/deleteM/:IDM', (req, res) => {
+  const monumentId = req.params.IDM;
+  console.log(`Tentative de suppression du Monument avec IDM: ${monumentId}`);  // Log pour déboguer
+  
+  
+
+  // Suppression du circuit
+//  circuits = circuits.filter((c) => c.IDC !== parseInt(circuitId));
+const query = 'DELETE FROM monument WHERE IDM = ?';
+
+db.query(query, [monumentId], (err, results) => {
+  if (err) {
+    console.error('Erreur lors de la Suppression du Monument:', err);
+    return res.status(500).json({ error: 'Erreur serveur.' });
+  }
+} )
+
+  console.log(`Monument supprimé avec IDC: ${monumentId}`);  // Log pour confirmer suppression
+
+  return res.send('Monument supprimé avec succès');
+});
+ 
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Serveur en cours d'exécution sur le port ${PORT}`);

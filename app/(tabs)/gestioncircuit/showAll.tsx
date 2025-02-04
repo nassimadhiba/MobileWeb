@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, ImageBackground, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 interface Circuit {
@@ -14,7 +14,6 @@ interface Circuit {
 
 const ShowAllCircuitsScreen: React.FC = () => {
   const [circuits, setCircuits] = useState<Circuit[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -31,8 +30,6 @@ const ShowAllCircuitsScreen: React.FC = () => {
       setCircuits(data);
     } catch (error) {
       console.error('Erreur lors du chargement des circuits:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -58,9 +55,7 @@ const ShowAllCircuitsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>🌟 Circuits Disponibles</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#FF7F24" />
-      ) : circuits.length === 0 ? (
+      {circuits.length === 0 ? (
         <Text style={styles.noData}>Aucun circuit disponible</Text>
       ) : (
         <FlatList
@@ -73,6 +68,7 @@ const ShowAllCircuitsScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,109 +1,51 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+const categories = [
+  { id: '1', title: 'Circuits touristiques de Fès', image: 'https://www.voyagesetevasions.com/villes/maroc/fes/visite-fes-maroc.jpg', route: 'ShowAllCircuitsScreen' },
+  { id: '2', title: 'Les Monuments de Fès', image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/78/63/45/caption.jpg?w=800&h=600&s=1', route: 'ShowAlMonumentsScreen' },
+  { id: '3', title: 'Célèbres Riads de Fès', image: 'https://cf.bstatic.com/xdata/images/hotel/square600/95441792.webp?k=43092cb40c9107e2351104b78041ae358d218297737fd936db1742dc945edb32&o=', route: 'Riad' },
+  { id: '4', title: 'Restaurants Traditionnels de Fès', image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/73/7c/50/sale.jpg?w=800&h=600&s=1', route: 'Restaurant' },
+];
 
-export default function TabTwoScreen() {
+const ExploreScreen: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}> Fès</Text>
+
+      <FlatList
+        data={categories}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() => navigation.navigate(item.route)}
+            activeOpacity={0.8}
+          >
+            <Image source={{ uri: item.image }} style={styles.image} />
+            <View style={styles.textContainer}>
+              <Text style={styles.cardText}>{item.title}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+  container: { flex: 1, backgroundColor: '#F5F0E1', padding: 15 },
+  title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, color: '#333' },
+  listContainer: { alignItems: 'center' },
+  card: { width: 170, backgroundColor: '#FFFFFF', borderRadius: 15, margin: 10, alignItems: 'center', overflow: 'hidden', elevation: 5 },
+  image: { width: '100%', height: 140, borderTopLeftRadius: 15, borderTopRightRadius: 15 },
+  textContainer: { padding: 10, backgroundColor: '#FFF', width: '100%', alignItems: 'center' },
+  cardText: { fontSize: 16, fontWeight: 'bold', color: '#333', textAlign: 'center' },
 });
+
+export default ExploreScreen;

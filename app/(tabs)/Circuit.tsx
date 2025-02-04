@@ -24,7 +24,7 @@ export default function CircuitScreen() {
       style={styles.background}
     >
       <View style={styles.overlay}>
-        <Text style={styles.title}>Circuit Management</Text>
+        <Text style={styles.title}>Gestion des Circuits</Text>
 
         {/* Boutons pour afficher et ajouter un circuit */}
         <TouchableOpacity
@@ -35,7 +35,7 @@ export default function CircuitScreen() {
   }}
 >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Show</Text>
+          <Text style={styles.buttonText}>Voir</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -46,7 +46,7 @@ export default function CircuitScreen() {
   }}
 >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Add</Text>
+          <Text style={styles.buttonText}>Ajouter</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>

@@ -10,7 +10,7 @@ interface Monument {
   ImgUrl: string;
 }
 
-const ShowAlMonuments: React.FC = () => {
+const ShowAlMonumentsScreen: React.FC = () => {
   const [monuments, setMonuments] = useState<Monument[]>([]);
   const navigation = useNavigation();
 
@@ -20,7 +20,7 @@ const ShowAlMonuments: React.FC = () => {
 
   const fetchMonuments = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8084/client/monuments');
+      const response = await fetch('http://10.0.2.2:3000/gestionmonument/showAl');
       if (!response.ok) {
         throw new Error('Erreur réseau');
       }
@@ -32,7 +32,7 @@ const ShowAlMonuments: React.FC = () => {
   };
 
   const renderMonumentCard = ({ item }: { item: Monument }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('MonumentDetail', { IDM: item.IDM })}>
+    <TouchableOpacity onPress={() => navigation.navigate('MonumentDetails', { IDM: item.IDM })}>
       <View style={[styles.card, { borderColor: '#ccc' }]}>
         <ImageBackground
           source={{ uri: item.ImgUrl || 'https://via.placeholder.com/150' }}
@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ShowAlMonuments;
+export default ShowAlMonumentsScreen;

@@ -44,7 +44,7 @@ const CircuitDetailsScreen: React.FC = () => {
     const fetchCircuitDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du circuit avec IDC:', IDC);
-        const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${IDC}`);
+        const response = await fetch(`http://10.0.2.2:3000/gestioncircuit/showC/${IDC}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }

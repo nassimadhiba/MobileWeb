@@ -11,6 +11,8 @@ import {
 } from 'react-native'; 
 import { enableScreens } from 'react-native-screens';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Feather'; 
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 type RootStackParamList = {
   Login: undefined;
@@ -47,11 +49,11 @@ import MonumentScreen from './Monument';
 import AddMonumentScreen  from './gestionmonument/add';
 import MonumentDetailsScreen from './gestionmonument/show';
 import EditMonumentScreen from './gestionmonument/edit';
-
+ 
 
 const Stack = createStackNavigator<RootStackParamList>();
 
- 
+const Tab = createBottomTabNavigator();
 
 
 
@@ -99,12 +101,12 @@ function LoginScreen({ navigation }: any) {
       style={styles.backgroundImage}
     >
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Welcome to Fes</Text>
+        <Text style={styles.title}>Bienvenue à Fès</Text>
 
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Username"
+            placeholder="Nom d'utilisateur"
             placeholderTextColor="#A0A0A0"
             value={username}
             onChangeText={setUsername}
@@ -114,7 +116,7 @@ function LoginScreen({ navigation }: any) {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="mot de passe"
             placeholderTextColor="#A0A0A0"
             secureTextEntry={!passwordVisible}
             value={password}
@@ -125,7 +127,11 @@ function LoginScreen({ navigation }: any) {
             style={styles.showPassword}
           >
             <Text style={styles.showPasswordText}>
-              {passwordVisible ? 'Hide' : 'Show'} password
+            <Icon
+          name={passwordVisible ? 'eye-off' : 'eye'} // Change l'icône selon l'état
+          size={20}
+          color="#1D4ED8" // Couleur de l'icône
+        />
             </Text>
           </TouchableOpacity>
         </View>
@@ -136,9 +142,15 @@ function LoginScreen({ navigation }: any) {
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Logging in...' : 'Log in'}
+            {loading ? 'Connexion en cours......' : 'Se connecter'}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ResetPassword')} // Navigue vers l'écran de réinitialisation
+        >
+          <Text style={styles.forgotPasswordText}>Oublier le mot de passe ?</Text>
+        </TouchableOpacity>
+        
       </SafeAreaView>
     </ImageBackground>
   );
@@ -146,9 +158,9 @@ function LoginScreen({ navigation }: any) {
 
 export default function App() {
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
   <Stack.Screen name="Login" component={LoginScreen} />
-  <Stack.Screen name="Explore" component={TabTwoScreen} />
+  <Stack.Screen name="Explore" component={TabTwoScreen}  options={{ tabBarStyle: { display: 'none' } }}/>
 
   <Stack.Screen 
   name="CircuitDetails" 
@@ -179,8 +191,7 @@ export default function App() {
   <Stack.Screen name="Monument" component={MonumentScreen} />
   <Stack.Screen name="AddMonumentScreen" component={AddMonumentScreen} />
   <Stack.Screen name="Edit" component={EditMonumentScreen} />
-
-  
+ 
 </Stack.Navigator>
 
   );}
@@ -215,4 +226,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: { color: '#000', fontWeight: 'bold', fontSize: 17 },
+  forgotPasswordText: {
+    color: '#FF7F24',
+    textDecorationLine: 'underline',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });

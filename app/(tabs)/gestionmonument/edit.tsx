@@ -101,9 +101,10 @@ const EditMonumentScreen: React.FC = () => {
 
       showModal('Succès', 'Monument mis à jour avec succès');
 
+      
       setTimeout(() => {
-        navigation.goBack();
-      }, 2000);
+        navigation.navigate('MonumentDetails', { IDM: IDM })
+      }, 2000); // Attendre 2 secondes avant de revenir
     } catch (error) {
       showModal('Erreur', 'Une erreur est survenue lors de la mise à jour.');
     }
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   modalButton: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#166534',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 6,

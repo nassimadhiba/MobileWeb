@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   ImageBackground,
   ScrollView,
   TouchableOpacity,
@@ -39,7 +38,6 @@ const CircuitDetailsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
   const [circuit, setCircuit] = useState<Circuit | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // Modal visibility state
 
   useEffect(() => {
@@ -55,8 +53,6 @@ const CircuitDetailsScreen: React.FC = () => {
         setCircuit(data);
       } catch (error) {
         console.error('❌ Erreur lors du chargement des détails du circuit:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -71,25 +67,26 @@ const CircuitDetailsScreen: React.FC = () => {
   const handleDelete = async () => {
     try {
       console.log('Suppression du circuit ID:', circuit?.IDC);
-      fetch(`http://10.0.2.2:8084/gestioncircuit/deleteC/${circuit?.IDC}`, { method: 'DELETE' });
 
-       
+      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/deleteC/${circuit?.IDC}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur de suppression : ${response.status}`);
+      }
+
       console.log('✅ Circuit supprimé avec succès');
       setIsDeleteModalVisible(false); // Ferme le modal après suppression
-      navigation.goBack(); // Retour à l'écran précédent après la suppression
+      navigation.navigate('ShowAllCircuitsScreen');
     } catch (error) {
       console.error('❌ Erreur lors de la suppression du circuit:', error);
     }
   };
-  
 
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false); // Ferme le modal sans effectuer la suppression
   };
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#FF7F24" style={styles.loader} />;
-  }
 
   if (!circuit) {
     return <Text style={styles.errorText}>Détails du circuit introuvables.</Text>;
@@ -175,7 +172,6 @@ const CircuitDetailsScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerImage: { width: '100%', height: 300 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end', padding: 20 },
   headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#f9dcc4' },

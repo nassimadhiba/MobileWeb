@@ -1,74 +1,116 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import ExploreScreen from './explore';
+import ShowAlMonumentsScreen from './gestionmonument/showAl';
+import CircuitDetailsScreen from './gestioncircuit/showC';
+import ShowAllCircuitsScreen from './gestioncircuit/showAll';
+import MonumentDetailsScreen from './gestionmonument/show';
+import  Riad from './riad';
+import RiadDetails from './RiadDetails';
+import Restaurant from './restaurant';
+import RestaurantDetails from './RestaurantDetails';
+import { StatusBar } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-export default function HomeScreen() {
+ function WelcomeScreen() {
+  const navigation = useNavigation();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ImageBackground
+      source={{ uri: 'https://th.bing.com/th/id/OIP.VRsbUgx4X9ieMQjjEpJNOAHaGL?w=600&h=500&rs=1&pid=ImgDetMain' }}
+      style={styles.backgroundImage}
+    >
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Bienvenue à Fès</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('Explore')}
+        >
+          <Text style={styles.buttonText}>Cliquer ici </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </ImageBackground>
+
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  backgroundImage: { flex: 1, resizeMode: 'cover' },
+  title: {
+    fontSize: 45,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#FF7F24',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  button: {
+    backgroundColor: '#FF7F24',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    marginTop: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 20 },
 });
+
+
+
+
+type RootStackParamList = {
+  
+  Explore: undefined;
+  CircuitDetails: { IDC: number };
+  ShowM: undefined;
+  ShowAllCircuitsScreen: undefined;
+  ShowAlMonumentsScreen :undefined;
+   
+};
+const Stack = createStackNavigator();
+
+export default function App() {
+  return (
+     
+      <Stack.Navigator   screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Explore" component={ExploreScreen} />
+        <Stack.Screen 
+        name="ShowAlMonumentsScreen" 
+        component={ShowAlMonumentsScreen} 
+        options={{ animation: 'none', title: 'Tous les Monuments' }} 
+  />
+  
+
+<Stack.Screen 
+  name="MonumentDetails" 
+  component={MonumentDetailsScreen} 
+  options={{ title: 'Détails du Monument' }} 
+/>
+       
+  <Stack.Screen 
+  name="CircuitDetails" 
+  component={CircuitDetailsScreen} 
+  options={{ title: 'Détails du Circuit' }} 
+/>
+<Stack.Screen 
+        name="ShowAllCircuitsScreen" 
+        component={ShowAllCircuitsScreen} 
+        options={{ animation: 'none', title: 'Tous les Circuits' }} 
+  />
+  <Stack.Screen name="Riad" component={Riad} />
+  <Stack.Screen name="RiadDetails" component={RiadDetails} />
+   
+  <Stack.Screen name="Restaurant" component={Restaurant} />
+  <Stack.Screen name="RestaurantDetails" component={RestaurantDetails} />
+  
+ 
+      </Stack.Navigator>
+      
+     
+  );
+}

@@ -21,7 +21,7 @@ export default function MonumentScreen() {
       style={styles.background}
     >
       <View style={styles.overlay}>
-        <Text style={styles.title}>Monument Management</Text>
+        <Text style={styles.title}>Gestion des Monuments</Text>
 
         {/* Boutons Supprimer, Ajouter, Modifier, Afficher */}
         <TouchableOpacity
@@ -32,7 +32,7 @@ export default function MonumentScreen() {
           }}
         >
           <FontAwesome5 name="eye" size={20} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Show</Text>
+          <Text style={styles.buttonText}>Voir</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -40,7 +40,7 @@ export default function MonumentScreen() {
           onPress={() => navigation.navigate('AddMonumentScreen')}
         >
           <FontAwesome5 name="plus" size={20} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Add</Text>
+          <Text style={styles.buttonText}>Ajouter</Text>
         </TouchableOpacity>
 
         
