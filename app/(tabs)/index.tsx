@@ -160,7 +160,7 @@ export default function App() {
   return (
     <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
   <Stack.Screen name="Login" component={LoginScreen} />
-  <Stack.Screen name="Explore" component={TabTwoScreen}  options={{ tabBarStyle: { display: 'none' } }}/>
+  <Stack.Screen name="Explore" component={TabTwoScreen}  />
 
   <Stack.Screen 
   name="CircuitDetails" 
