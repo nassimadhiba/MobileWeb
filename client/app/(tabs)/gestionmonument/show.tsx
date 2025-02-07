@@ -42,7 +42,7 @@ const MonumentDetailsScreen: React.FC = () => {
     const fetchMonumentDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du monument avec IDM:', IDM);
-        const response = await fetch(`http://10.0.2.2:3000/gestionmonument/show/${IDM}`);
+        const response = await fetch(`http://192.168.137.39:3000/gestionmonument/show/${IDM}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }

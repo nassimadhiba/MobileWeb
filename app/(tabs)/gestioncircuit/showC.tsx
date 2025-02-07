@@ -44,7 +44,7 @@ const CircuitDetailsScreen: React.FC = () => {
     const fetchCircuitDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du circuit avec IDC:', IDC);
-        const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${IDC}`);
+        const response = await fetch(`http://100.103.104.110:8084/gestioncircuit/showC/${IDC}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }
@@ -68,7 +68,7 @@ const CircuitDetailsScreen: React.FC = () => {
     try {
       console.log('Suppression du circuit ID:', circuit?.IDC);
 
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/deleteC/${circuit?.IDC}`, {
+      const response = await fetch(`http://100.103.104.110:8084/gestioncircuit/deleteC/${circuit?.IDC}`, {
         method: 'DELETE',
       });
 
@@ -120,7 +120,15 @@ const CircuitDetailsScreen: React.FC = () => {
           <Text style={styles.cardTitle}>Description</Text>
           <Text style={styles.description}>{circuit.Descreption}</Text>
         </View>
-
+         <View>
+         <TouchableOpacity
+            onPress={() => navigation.navigate('ShowAllCircuitsScreen')} 
+             style={styles.button}
+              >
+           <MaterialIcons name="list" size={24} color="white" />
+            <Text style={styles.buttonText}>Voir tous les circuits</Text>
+            </TouchableOpacity>
+         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
             <MaterialIcons name="edit" size={20} color="white" />

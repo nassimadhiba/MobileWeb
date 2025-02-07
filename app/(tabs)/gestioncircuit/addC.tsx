@@ -40,7 +40,7 @@ const AddCircuitScreen: React.FC = () => {
 
     console.log('Form data:', formData);
 
-    fetch('http://10.0.2.2:8084/gestioncircuit/addC', {
+    fetch('http://100.103.104.110:8084/gestioncircuit/addC', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

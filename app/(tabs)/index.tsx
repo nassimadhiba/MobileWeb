@@ -14,24 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather'; 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-type RootStackParamList = {
-  Login: undefined;
-  Explore: { id: number; username: string };
-  CircuitDetails: { IDC: number };
-  Monument: undefined;
-  Circuit: undefined;
-  AddCircuit: undefined;
-  ShowM: undefined;
-  AddMonumentScreen: undefined; // ✅ Assurez-vous que cela existe
-  EditC: undefined;
-  ShowAllCircuitsScreen: undefined;
-  ShowAlMonumentsScreen :undefined;
-   
-};
-
-
-
-enableScreens(false);
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native'; // Importation manquante
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -50,6 +32,27 @@ import AddMonumentScreen  from './gestionmonument/add';
 import MonumentDetailsScreen from './gestionmonument/show';
 import EditMonumentScreen from './gestionmonument/edit';
  
+
+type RootStackParamList = {
+  Login: undefined;
+  Explore: { id: number; username: string };
+  CircuitDetails: { IDC: number };
+  Monument: undefined;
+  Circuit: undefined;
+  AddCircuit: undefined;
+  ShowM: undefined;
+  AddMonumentScreen: undefined; // ✅ Assurez-vous que cela existe
+  EditC: undefined;
+  ShowAllCircuitsScreen: undefined;
+  ShowAlMonumentsScreen :undefined;
+  MonumentDetails : undefined;
+  Edit : undefined ;
+   
+};
+
+
+
+//enableScreens(false);
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -72,7 +75,7 @@ function LoginScreen({ navigation }: any) {
     try {
       setLoading(true);
 
-      const response = await fetch('http://10.0.2.2:8084/login', {
+      const response = await fetch('http://100.103.104.110:8084/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +104,7 @@ function LoginScreen({ navigation }: any) {
       style={styles.backgroundImage}
     >
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Bienvenue à Fès</Text>
+        <Text style={styles.title}>Bienvenue à Fès </Text>
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -158,8 +161,8 @@ function LoginScreen({ navigation }: any) {
 
 export default function App() {
   return (
-    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
-  <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Navigator initialRouteName="Login"  >
+  <Stack.Screen name="Login" component={LoginScreen} screenOptions={{ headerShown: false }} />
   <Stack.Screen name="Explore" component={TabTwoScreen}  />
 
   <Stack.Screen 

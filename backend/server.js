@@ -28,6 +28,7 @@ db.connect((err) => {
 
 // Route d'authentification
 app.post('/login', (req, res) => {
+  console.log('login')
   const { username, password } = req.body;
 
   if (!username || !password) {

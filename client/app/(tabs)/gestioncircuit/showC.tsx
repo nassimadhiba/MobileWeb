@@ -44,7 +44,7 @@ const CircuitDetailsScreen: React.FC = () => {
     const fetchCircuitDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du circuit avec IDC:', IDC);
-        const response = await fetch(`http://10.0.2.2:3000/gestioncircuit/showC/${IDC}`);
+        const response = await fetch(`http://192.168.137.39:3000/gestioncircuit/showC/${IDC}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }
@@ -59,34 +59,7 @@ const CircuitDetailsScreen: React.FC = () => {
     fetchCircuitDetails();
   }, [IDC]);
 
-  const handleEdit = () => {
-    console.log('Navigation vers EditCircuit avec ID:', IDC);
-    navigation.navigate('EditC', { IDC });
-  };
-
-  const handleDelete = async () => {
-    try {
-      console.log('Suppression du circuit ID:', circuit?.IDC);
-
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/deleteC/${circuit?.IDC}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur de suppression : ${response.status}`);
-      }
-
-      console.log('✅ Circuit supprimé avec succès');
-      setIsDeleteModalVisible(false); // Ferme le modal après suppression
-      navigation.navigate('ShowAllCircuitsScreen');
-    } catch (error) {
-      console.error('❌ Erreur lors de la suppression du circuit:', error);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setIsDeleteModalVisible(false); // Ferme le modal sans effectuer la suppression
-  };
+   
 
   if (!circuit) {
     return <Text style={styles.errorText}>Détails du circuit introuvables.</Text>;
@@ -121,51 +94,11 @@ const CircuitDetailsScreen: React.FC = () => {
           <Text style={styles.description}>{circuit.Descreption}</Text>
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
-            <MaterialIcons name="edit" size={20} color="white" />
-            <Text style={styles.buttonText}>Modifier</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
-            onPress={() => setIsDeleteModalVisible(true)} // Affiche le modal de suppression
-          >
-            <MaterialIcons name="delete" size={20} color="white" />
-            <Text style={styles.buttonText}>Supprimer</Text>
-          </TouchableOpacity>
-        </View>
+        
       </View>
 
       {/* Modal de confirmation de suppression */}
-      <Modal
-        isVisible={isDeleteModalVisible}
-        onBackdropPress={handleDeleteCancel}
-        onBackButtonPress={handleDeleteCancel}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <MaterialIcons name="warning" size={60} color="#FF6B6B" />
-          <Text style={styles.modalTitle}>Confirmation</Text>
-          <Text style={styles.modalMessage}>
-            Êtes-vous sûr de vouloir supprimer ce circuit ?
-          </Text>
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={handleDeleteCancel}
-            >
-              <Text style={styles.cancelText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.confirmButton]}
-              onPress={handleDelete}
-            >
-              <Text style={styles.confirmText}>Supprimer</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+       
     </ScrollView>
   );
 };

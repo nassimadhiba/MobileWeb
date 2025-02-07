@@ -20,7 +20,7 @@ const ShowAlMonumentsScreen: React.FC = () => {
 
   const fetchMonuments = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8084/gestionmonument/showAl');
+      const response = await fetch('http://100.103.104.110:8084/gestionmonument/showAl');
       if (!response.ok) {
         throw new Error('Erreur réseau');
       }

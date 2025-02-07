@@ -39,7 +39,7 @@ const EditCircuitScreen: React.FC = () => {
   useEffect(() => {
     const fetchCircuitDetails = async () => {
       try {
-        const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/showC/${IDC}`);
+        const response = await fetch(`http://100.103.104.110:8084/gestioncircuit/showC/${IDC}`);
         const data = await response.json();
         setName(data.Name);
         setDescription(data.Descreption);
@@ -65,7 +65,7 @@ const EditCircuitScreen: React.FC = () => {
     }
 
     try {
-      await fetch(`http://10.0.2.2:8084/gestioncircuit/editC/${IDC}`, {
+      await fetch(`http://100.103.104.110:8084/gestioncircuit/editC/${IDC}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

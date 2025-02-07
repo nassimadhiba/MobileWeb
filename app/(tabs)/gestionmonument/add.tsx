@@ -67,7 +67,7 @@ const AddMonumentScreen: React.FC = () => {
     console.log('Form data:', formData);
 
     // Requête POST
-    fetch('http://10.0.2.2:8084/gestionmonument/add', {
+    fetch('http://100.103.104.110:8084/gestionmonument/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

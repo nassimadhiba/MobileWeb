@@ -42,7 +42,7 @@ const MonumentDetailsScreen: React.FC = () => {
     const fetchMonumentDetails = async () => {
       try {
         console.log('🔄 Récupération des détails du monument avec IDM:', IDM);
-        const response = await fetch(`http://10.0.2.2:8084/gestionmonument/show/${IDM}`);
+        const response = await fetch(`http://100.103.104.110:8084/gestionmonument/show/${IDM}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }
@@ -65,7 +65,7 @@ const MonumentDetailsScreen: React.FC = () => {
   const handleDelete = async () => {
     try {
       console.log('Suppression du monument IDM:', monument?.IDM);
-      const response = await fetch(`http://10.0.2.2:8084/gestioncircuit/deleteM/${monument?.IDM}`, {
+      const response = await fetch(`http://100.103.104.110:8084/gestionmonument/deleteM/${monument?.IDM}`, {
         method: 'DELETE',
       });
 
@@ -100,7 +100,15 @@ const MonumentDetailsScreen: React.FC = () => {
           <Text style={styles.cardTitle}>Description</Text>
           <Text style={styles.description}>{monument.Descreption}</Text>
         </View>
-
+          <View>
+                  <TouchableOpacity 
+           onPress={() => navigation.navigate('ShowAlMonumentsScreen')} 
+           style={styles.button}
+         >
+           <MaterialIcons name="list" size={24} color="white" />
+           <Text style={styles.buttonText}>Voir tous les monuments</Text>
+         </TouchableOpacity>
+                  </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
             <MaterialIcons name="edit" size={20} color="white" />

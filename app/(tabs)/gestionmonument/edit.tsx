@@ -47,7 +47,7 @@ const EditMonumentScreen: React.FC = () => {
   useEffect(() => {
     const fetchMonumentDetails = async () => {
       try {
-        const response = await fetch(`http://10.0.2.2:8084/gestionmonument/show/${IDM}`);
+        const response = await fetch(`http://100.103.104.110:8084/gestionmonument/show/${IDM}`);
         if (!response.ok) {
           throw new Error(`Erreur réseau: ${response.status}`);
         }
@@ -89,7 +89,7 @@ const EditMonumentScreen: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://10.0.2.2:8084/gestionmonument/edit/${IDM}`, {
+      const response = await fetch(`http://100.103.104.110:8084/gestionmonument/edit/${IDM}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedMonument),
